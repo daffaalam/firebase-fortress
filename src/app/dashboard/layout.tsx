@@ -26,7 +26,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/icons";
-import { ChevronDown, LayoutDashboard, LogOut, Users } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Users, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -62,6 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const getPageTitle = () => {
     if (pathname === "/dashboard") return "Dashboard";
     if (pathname.startsWith("/dashboard/users")) return "User Management";
+    if (pathname.startsWith("/dashboard/profile")) return "Profile";
     return "Dashboard";
   };
 
@@ -114,6 +115,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
