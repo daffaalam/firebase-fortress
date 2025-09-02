@@ -21,7 +21,7 @@ import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { listUsers } from "@/lib/actions";
-import type { UserRecord } from "firebase-admin/auth";
+import type { UserRecord } from "@/types";
 
 export function UserTable() {
   const { toast } = useToast();

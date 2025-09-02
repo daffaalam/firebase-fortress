@@ -18,9 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getRoleSuggestions } from "@/lib/actions";
-import { type SuggestUserRolesOutput } from "@/ai/flows/suggest-user-roles";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
+import type { SuggestUserRolesOutput } from "@/types";
 
 const formSchema = z.object({
   userProfile: z.string().min(10, {

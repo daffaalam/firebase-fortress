@@ -9,27 +9,12 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const SuggestUserRolesInputSchema = z.object({
-  userProfile: z
-    .string()
-    .describe('A description of the user profile, including details like name, job title, and department.'),
-  userActivity: z
-    .string()
-    .describe('A description of the user activity, including details like recent actions and access patterns.'),
-});
-export type SuggestUserRolesInput = z.infer<typeof SuggestUserRolesInputSchema>;
-
-const SuggestUserRolesOutputSchema = z.object({
-  suggestedRoles: z
-    .array(z.string())
-    .describe('An array of suggested roles for the user, based on their profile and activity.'),
-  justification: z
-    .string()
-    .describe('A justification for the suggested roles, explaining why they are appropriate.'),
-});
-export type SuggestUserRolesOutput = z.infer<typeof SuggestUserRolesOutputSchema>;
+import {
+  SuggestUserRolesInputSchema,
+  SuggestUserRolesOutputSchema,
+  type SuggestUserRolesInput,
+  type SuggestUserRolesOutput,
+} from '@/types';
 
 export async function suggestUserRoles(input: SuggestUserRolesInput): Promise<SuggestUserRolesOutput> {
   return suggestUserRolesFlow(input);

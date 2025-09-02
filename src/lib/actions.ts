@@ -2,13 +2,12 @@
 
 import {
   suggestUserRoles,
-  type SuggestUserRolesInput,
-  type SuggestUserRolesOutput,
 } from '@/ai/flows/suggest-user-roles';
 import {auth as adminAuth} from 'firebase-admin';
 import {initializeAdminApp} from './firebase-admin';
-import {UserRecord} from 'firebase-admin/auth';
 import {isToday} from 'date-fns';
+import type { SuggestUserRolesInput, SuggestUserRolesOutput, DashboardStats, UserRecord } from '@/types';
+
 
 export async function getRoleSuggestions(
   input: SuggestUserRolesInput
@@ -33,13 +32,6 @@ export async function listUsers(): Promise<UserRecord[]> {
     throw new Error('Failed to list users.');
   }
 }
-
-export type DashboardStats = {
-  totalUsers: number;
-  activeToday: number;
-  rolesDefined: number;
-  aiSuggestions: number;
-};
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   try {
