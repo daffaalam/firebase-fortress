@@ -3,7 +3,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { User as UserIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { getGravatarUrl } from "@/lib/utils";
 
 function ProfileDataItem({ label, value }: { label: string; value: string | undefined | null }) {
   return (
@@ -51,6 +51,8 @@ export default function ProfilePage() {
     );
   }
 
+  const avatarUrl = user.photoURL || getGravatarUrl(user.email);
+
   return (
     <main className="flex-1 p-4 sm:p-6">
       <Card className="shadow-lg">
@@ -73,7 +75,7 @@ export default function ProfilePage() {
                 </Label>
                 <div className="col-span-2 flex items-center gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? "Pengguna"} />
+                    <AvatarImage src={avatarUrl} alt={user.displayName ?? "Pengguna"} />
                     <AvatarFallback className="text-3xl">{getInitials(user.email)}</AvatarFallback>
                   </Avatar>
                   <Input id="photoURL" defaultValue={user.photoURL || ""} placeholder="URL ke gambar" />

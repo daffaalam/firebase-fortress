@@ -30,6 +30,7 @@ import { ChevronDown, LayoutDashboard, LogOut, Users, User } from "lucide-react"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { getGravatarUrl } from "@/lib/utils";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -65,6 +66,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (pathname.startsWith("/dashboard/profile")) return "Profile";
     return "Dashboard";
   };
+
+  const avatarUrl = user?.photoURL || getGravatarUrl(user?.email);
 
   return (
     <SidebarProvider>
@@ -106,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                  <AvatarImage src={avatarUrl} alt={user?.displayName ?? "User"} />
                   <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
                 </Avatar>
                 <span className="hidden sm:inline">{user?.email}</span>

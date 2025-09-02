@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { listUsers } from "@/lib/actions";
 import type { UserRecord } from "@/types";
+import { getGravatarUrl } from "@/lib/utils";
 
 export function UserTable() {
   const { toast } = useToast();
@@ -73,7 +74,7 @@ export function UserTable() {
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName} />
+                    <AvatarImage src={user.photoURL || getGravatarUrl(user.email)} alt={user.displayName} />
                     <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
                   </Avatar>
                   <div>
