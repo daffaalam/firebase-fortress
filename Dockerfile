@@ -14,6 +14,9 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Ensure public directory exists to prevent copy errors later
+RUN if [ ! -d "public" ]; then mkdir "public"; fi
+
 # Build the application
 RUN npm run build
 
