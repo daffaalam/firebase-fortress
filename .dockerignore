@@ -1,0 +1,31 @@
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build artifacts
+.next
+
+# Logs
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# IDE and OS specific
+.DS_Store
+.idea
+.vscode
+.idx
+
+# Local environment variables
+.env.local
+
+# Documentation
+README.md
+docs

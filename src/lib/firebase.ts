@@ -41,5 +41,8 @@ auth.languageCode = 'id';
 
 
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  'authdomain': 'auth.firebase.fortress.com'
+});
 
 export { app, auth, googleProvider };
