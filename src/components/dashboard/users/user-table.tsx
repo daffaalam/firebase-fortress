@@ -16,11 +16,15 @@ import { useEffect, useState } from "react";
 import { listUsers } from "@/lib/actions";
 import type { UserRecord } from "@/types";
 import { getGravatarUrl } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export function UserTable() {
   const { toast } = useToast();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -112,17 +116,27 @@ export function UserTable() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleAction("Perbarui", user.displayName)}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (user.uid === currentUser?.uid) {
+                          router.push("/dashboard/profile");
+                        } else {
+                          handleAction("Perbarui", user.displayName);
+                        }
+                      }}
+                    >
                       <Edit className="mr-2 h-4 w-4" />
                       <span>Perbarui Profil</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAction("Hapus", user.displayName)}
-                      className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      <span>Hapus Pengguna</span>
-                    </DropdownMenuItem>
+                    {user.uid !== currentUser?.uid && (
+                      <DropdownMenuItem
+                        onClick={() => handleAction("Hapus", user.displayName)}
+                        className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Hapus Pengguna</span>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
