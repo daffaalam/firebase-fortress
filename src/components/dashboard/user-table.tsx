@@ -21,11 +21,11 @@ import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const users = [
-  { id: "1", name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
-  { id: "2", name: "Bob Smith", email: "bob.s@example.com", role: "Editor", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026705d" },
-  { id: "3", name: "Charlie Brown", email: "charlie.b@example.com", role: "Viewer", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026706d" },
-  { id: "4", name: "Diana Prince", email: "diana.p@example.com", role: "Editor", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026707d" },
-  { id: "5", name: "Ethan Hunt", email: "ethan.h@example.com", role: "Viewer", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026708d" },
+  { id: "1", name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", avatar: "https://picsum.photos/seed/alice/40/40" },
+  { id: "2", name: "Bob Smith", email: "bob.s@example.com", role: "Editor", avatar: "https://picsum.photos/seed/bob/40/40" },
+  { id: "3", name: "Charlie Brown", email: "charlie.b@example.com", role: "Viewer", avatar: "https://picsum.photos/seed/charlie/40/40" },
+  { id: "4", name: "Diana Prince", email: "diana.p@example.com", role: "Editor", avatar: "https://picsum.photos/seed/diana/40/40" },
+  { id: "5", name: "Ethan Hunt", email: "ethan.h@example.com", role: "Viewer", avatar: "https://picsum.photos/seed/ethan/40/40" },
 ];
 
 export function UserTable() {
@@ -53,7 +53,7 @@ export function UserTable() {
             <TableRow key={user.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar>
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>

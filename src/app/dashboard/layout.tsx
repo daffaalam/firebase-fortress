@@ -66,6 +66,13 @@ export default function DashboardLayout({
     if (!email) return "U";
     return email.substring(0, 2).toUpperCase();
   };
+
+  const getPageTitle = () => {
+    if (pathname === '/dashboard') return 'Dashboard';
+    if (pathname.startsWith('/dashboard/users')) return 'User Management';
+    if (pathname.startsWith('/dashboard/ai-tools')) return 'AI Tools';
+    return 'Dashboard';
+  };
   
   return (
     <SidebarProvider>
@@ -86,6 +93,22 @@ export default function DashboardLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/users')}>
+                <Link href="/dashboard/users">
+                  <Users />
+                  Users
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/ai-tools')}>
+                <Link href="/dashboard/ai-tools">
+                  <Bot />
+                  AI Tools
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
@@ -93,7 +116,7 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="md:hidden" />
-            <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{getPageTitle()}</h1>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

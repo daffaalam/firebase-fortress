@@ -1,45 +1,34 @@
-import { UserTable } from "@/components/dashboard/user-table";
-import { RoleSuggester } from "@/components/dashboard/role-suggester";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Users, Bot } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Users, Activity, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function DashboardPage() {
+  const stats = [
+    { title: "Total Users", value: "125", Icon: Users },
+    { title: "Active Today", value: "32", Icon: Activity },
+    { title: "Roles Defined", value: "3", Icon: ShieldCheck },
+    { title: "AI Suggestions", value: "18", Icon: Sparkles },
+  ];
+
   return (
     <main className="flex-1 p-4 sm:p-6">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <Users className="h-6 w-6 text-primary" />
-                <div>
-                  <CardTitle>User Management</CardTitle>
-                  <CardDescription>View, update, and manage all users in your application.</CardDescription>
-                </div>
-              </div>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold tracking-tight">Welcome back!</h2>
+        <p className="text-muted-foreground">
+          Here's a quick overview of your application's status.
+        </p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map(({ title, value, Icon }) => (
+          <Card key={title} className="shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{title}</CardTitle>
+              <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <UserTable />
+              <div className="text-2xl font-bold">{value}</div>
             </CardContent>
           </Card>
-        </div>
-
-        <div className="lg:col-span-1">
-          <Card className="shadow-lg">
-             <CardHeader>
-              <div className="flex items-center gap-3">
-                <Bot className="h-6 w-6 text-primary" />
-                <div>
-                  <CardTitle>AI Role Suggester</CardTitle>
-                  <CardDescription>Get AI-powered role suggestions for new users.</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <RoleSuggester />
-            </CardContent>
-          </Card>
-        </div>
+        ))}
       </div>
     </main>
   );

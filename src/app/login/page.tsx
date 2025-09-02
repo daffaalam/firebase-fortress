@@ -32,7 +32,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon, Logo } from "@/components/icons";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, KeyRound } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -48,6 +48,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSsoLoading, setIsSsoLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,6 +96,15 @@ export default function LoginPage() {
     } finally {
       setIsGoogleLoading(false);
     }
+  }
+
+  async function handleSsoSignIn() {
+    setIsSsoLoading(true);
+    toast({
+      title: "Feature Not Available",
+      description: "SSO Sign-In is not implemented in this demo.",
+    });
+    setIsSsoLoading(false);
   }
 
   return (
@@ -153,14 +163,24 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading}>
-            {isGoogleLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <GoogleIcon className="mr-2 h-5 w-5" />
-            )}
-            Google
-          </Button>
+          <div className="space-y-2">
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading}>
+              {isGoogleLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <GoogleIcon className="mr-2 h-5 w-5" />
+              )}
+              Google
+            </Button>
+            <Button variant="outline" className="w-full" onClick={handleSsoSignIn} disabled={isSsoLoading}>
+              {isSsoLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="mr-2 h-5 w-5" />
+              )}
+              Sign In with SSO
+            </Button>
+          </div>
 
           <div className="mt-6 text-center text-sm">
             Don&apos;t have an account?{" "}
