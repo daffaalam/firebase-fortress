@@ -17,26 +17,67 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-const users = [
-  { id: "1", name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", avatar: "https://picsum.photos/seed/alice/40/40" },
-  { id: "2", name: "Bob Smith", email: "bob.s@example.com", role: "Editor", avatar: "https://picsum.photos/seed/bob/40/40" },
-  { id: "3", name: "Charlie Brown", email: "charlie.b@example.com", role: "Viewer", avatar: "https://picsum.photos/seed/charlie/40/40" },
-  { id: "4", name: "Diana Prince", email: "diana.p@example.com", role: "Editor", avatar: "https://picsum.photos/seed/diana/40/40" },
-  { id: "5", name: "Ethan Hunt", email: "ethan.h@example.com", role: "Viewer", avatar: "https://picsum.photos/seed/ethan/40/40" },
-];
+import { useEffect, useState } from "react";
+import { listUsers } from "@/lib/actions";
+import type { UserRecord } from "firebase-admin/auth";
 
 export function UserTable() {
-    const { toast } = useToast();
+  const { toast } = useToast();
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const handleAction = (action: string, userName: string) => {
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const userList = await listUsers();
+        setUsers(userList);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
         toast({
-            title: `${action} Action`,
-            description: `${action} action for ${userName} is not implemented in this demo.`,
-        })
+          variant: "destructive",
+          title: "Failed to load users",
+          description: "Could not retrieve the user list from the server.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [toast]);
+
+  const handleAction = (action: string, userName: string | undefined) => {
+    toast({
+      title: `${action} Action`,
+      description: `${action} action for ${userName || 'user'} is not implemented in this demo.`,
+    });
+  };
+
+  const getInitials = (displayName: string | undefined) => {
+    if (!displayName) return "U";
+    const names = displayName.split(' ');
+    if (names.length > 1) {
+      return names[0][0] + names[1][0];
     }
+    return displayName.substring(0, 2).toUpperCase();
+  };
+  
+  const getRole = (customClaims: { [key: string]: any } | undefined) => {
+    if (customClaims?.admin) return 'Admin';
+    if (customClaims?.editor) return 'Editor';
+    return 'Viewer';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border">
@@ -50,21 +91,23 @@ export function UserTable() {
         </TableHeader>
         <TableBody>
           {users.map((user) => (
-            <TableRow key={user.id}>
+            <TableRow key={user.uid}>
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName} />
+                    <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{user.displayName || 'N/A'}</div>
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="hidden sm:table-cell">
-                <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                 <Badge variant={getRole(user.customClaims) === 'Admin' ? 'default' : 'secondary'}>
+                  {getRole(user.customClaims)}
+                </Badge>
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -75,11 +118,11 @@ export function UserTable() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleAction('Update', user.name)}>
+                    <DropdownMenuItem onClick={() => handleAction('Update', user.displayName)}>
                       <Edit className="mr-2 h-4 w-4" />
                       <span>Update Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleAction('Delete', user.name)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                    <DropdownMenuItem onClick={() => handleAction('Delete', user.displayName)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
                       <Trash2 className="mr-2 h-4 w-4" />
                       <span>Delete User</span>
                     </DropdownMenuItem>

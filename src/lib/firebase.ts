@@ -14,7 +14,6 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // To use this file, you need to create a .env.local file in the root of your project
@@ -33,16 +32,6 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
-// TODO: Replace with your custom domain if you have one.
-// This is used for authentication pop-ups, password resets, etc.
-// Make sure this domain is authorized in the Firebase console.
-// auth.tenantId = 'my-tenant-id'; // for multi-tenancy
-auth.languageCode = 'id';
-
-
 const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  'authdomain': 'auth.firebase.fortress.com'
-});
 
 export { app, auth, googleProvider };
