@@ -1,12 +1,44 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Users, Activity, ShieldCheck, Sparkles } from "lucide-react";
+import {Card, CardHeader, CardTitle, CardContent} from '@/components/ui/card';
+import {getDashboardStats, type DashboardStats} from '@/lib/actions';
+import {Users, Activity, ShieldCheck, Sparkles, AlertTriangle} from 'lucide-react';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert';
 
-export default function DashboardPage() {
-  const stats = [
-    { title: "Total Users", value: "125", Icon: Users },
-    { title: "Active Today", value: "32", Icon: Activity },
-    { title: "Roles Defined", value: "3", Icon: ShieldCheck },
-    { title: "AI Suggestions", value: "18", Icon: Sparkles },
+async function StatCard({
+  title,
+  value,
+  Icon,
+}: {
+  title: string;
+  value: string | number;
+  Icon: React.ElementType;
+}) {
+  return (
+    <Card className="shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default async function DashboardPage() {
+  const stats = await getDashboardStats();
+
+  const isServiceAccountMissing = !process.env.FIREBASE_SERVICE_ACCOUNT_KEY && stats.totalUsers === 0;
+
+  const statItems = [
+    {title: 'Total Users', value: stats.totalUsers, Icon: Users},
+    {title: 'Active Today', value: stats.activeToday, Icon: Activity},
+    {title: 'Roles Defined', value: stats.rolesDefined, Icon: ShieldCheck},
+    {title: 'AI Suggestions', value: stats.aiSuggestions, Icon: Sparkles},
   ];
 
   return (
@@ -14,20 +46,22 @@ export default function DashboardPage() {
       <div className="mb-8">
         <h2 className="text-3xl font-bold tracking-tight">Welcome back!</h2>
         <p className="text-muted-foreground">
-          Here's a quick overview of your application's status.
+          Here&apos;s a quick overview of your application&apos;s status.
         </p>
       </div>
+      {isServiceAccountMissing && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Konfigurasi Diperlukan</AlertTitle>
+          <AlertDescription>
+            Variabel lingkungan `FIREBASE_SERVICE_ACCOUNT_KEY` tidak diatur.
+            Beberapa fitur, seperti menampilkan data dasbor nyata dan daftar pengguna, tidak akan berfungsi dengan benar. Silakan atur variabel lingkungan untuk mengaktifkan fungsionalitas penuh.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map(({ title, value, Icon }) => (
-          <Card key={title} className="shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{title}</CardTitle>
-              <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{value}</div>
-            </CardContent>
-          </Card>
+        {statItems.map(({title, value, Icon}) => (
+          <StatCard key={title} title={title} value={value} Icon={Icon} />
         ))}
       </div>
     </main>
