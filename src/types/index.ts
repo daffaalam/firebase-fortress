@@ -3,8 +3,6 @@ import type { UserRecord as FirebaseUserRecord } from "firebase-admin/auth";
 export type DashboardStats = {
   totalUsers: number;
   activeToday: number;
-  rolesDefined: number;
-  aiSuggestions: number;
 };
 
 // We create a serializable UserRecord type because the default one is not.

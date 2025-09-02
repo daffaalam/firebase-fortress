@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getDashboardStats } from "@/lib/actions";
-import { Users, Activity, ShieldCheck, Sparkles, AlertTriangle } from "lucide-react";
+import { Users, Activity, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 async function StatCard({ title, value, Icon }: { title: string; value: string | number; Icon: React.ElementType }) {
@@ -25,7 +25,6 @@ export default async function DashboardPage() {
   const statItems = [
     { title: "Total Users", value: stats.totalUsers, Icon: Users },
     { title: "Active Today", value: stats.activeToday, Icon: Activity },
-    { title: "Roles Defined", value: stats.rolesDefined, Icon: ShieldCheck },
   ];
 
   return (

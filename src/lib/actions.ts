@@ -25,15 +25,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       (user) => user.metadata.lastSignInTime && isToday(new Date(user.metadata.lastSignInTime)),
     ).length;
 
-    // These are static for now
-    const rolesDefined = 3;
-    const aiSuggestions = 18;
-
     return {
       totalUsers,
       activeToday,
-      rolesDefined,
-      aiSuggestions,
     };
   } catch (error) {
     console.error("Error getting dashboard stats:", error);
@@ -41,8 +35,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     return {
       totalUsers: 0,
       activeToday: 0,
-      rolesDefined: 0,
-      aiSuggestions: 0,
     };
   }
 }

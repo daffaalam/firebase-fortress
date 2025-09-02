@@ -1,16 +1,9 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { listUsers } from "@/lib/actions";
@@ -42,13 +35,6 @@ export function UserTable() {
     fetchUsers();
   }, [toast]);
 
-  const handleAction = (action: string, userName: string | undefined) => {
-    toast({
-      title: `${action} Action`,
-      description: `${action} action for ${userName || "user"} is not implemented in this demo.`,
-    });
-  };
-
   const getInitials = (displayName: string | undefined) => {
     if (!displayName) return "U";
     const names = displayName.split(" ");
@@ -79,7 +65,6 @@ export function UserTable() {
           <TableRow>
             <TableHead>User</TableHead>
             <TableHead className="hidden sm:table-cell">Role</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -101,29 +86,6 @@ export function UserTable() {
                 <Badge variant={getRole(user.customClaims) === "Admin" ? "default" : "secondary"}>
                   {getRole(user.customClaims)}
                 </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">User Actions</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleAction("Update", user.displayName)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      <span>Update Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAction("Delete", user.displayName)}
-                      className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      <span>Delete User</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
