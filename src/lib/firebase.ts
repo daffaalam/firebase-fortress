@@ -32,6 +32,14 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
+
+// TODO: Replace with your custom domain if you have one.
+// This is used for authentication pop-ups, password resets, etc.
+// Make sure this domain is authorized in the Firebase console.
+// auth.tenantId = 'my-tenant-id'; // for multi-tenancy
+auth.languageCode = 'id';
+
+
 const googleProvider = new GoogleAuthProvider();
 
 export { app, auth, googleProvider };
