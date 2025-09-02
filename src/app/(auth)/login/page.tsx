@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { auth, googleProvider } from "@/lib/firebase";
+import { getFirebaseClient } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon, Logo } from "@/components/icons";
 import { useState } from "react";
@@ -44,6 +44,7 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      const { auth } = await getFirebaseClient();
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Success",
@@ -64,6 +65,7 @@ export default function LoginPage() {
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
     try {
+      const { auth, googleProvider } = await getFirebaseClient();
       await signInWithPopup(auth, googleProvider);
       toast({
         title: "Success",

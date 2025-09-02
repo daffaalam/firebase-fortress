@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getGravatarUrl } from "@/lib/utils";
 import { useState } from "react";
-import { auth } from "@/lib/firebase";
+import { getFirebaseClient } from "@/lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 
@@ -60,6 +60,7 @@ export default function ProfilePage() {
 
     setIsPasswordResetLoading(true);
     try {
+      const { auth } = await getFirebaseClient();
       await sendPasswordResetEmail(auth, user.email);
       toast({
         title: "Email Terkirim",

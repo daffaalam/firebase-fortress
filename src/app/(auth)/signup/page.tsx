@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from "@/lib/firebase";
+import { getFirebaseClient } from "@/lib/firebase";
 import { Logo } from "@/components/icons";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -42,6 +42,7 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      const { auth } = await getFirebaseClient();
       await createUserWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Account Created",

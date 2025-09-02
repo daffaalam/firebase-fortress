@@ -1,36 +1,39 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth, GoogleAuthProvider } from "firebase/auth";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// IMPORTANT: Replace with your app's Firebase project configuration.
-// You can get this from the Firebase console.
-// It is recommended to use environment variables for this sensitive information.
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+// Variabel untuk menyimpan instance Firebase yang sudah diinisialisasi
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let googleProvider: GoogleAuthProvider | null = null;
 
-// To use this file, you need to create a .env.local file in the root of your project
-// and add your Firebase configuration like this:
-//
-// NEXT_PUBLIC_FIREBASE_API_KEY="your-api-key"
-// NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-auth-domain"
-// NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
-// NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-storage-bucket"
-// NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="your-messaging-sender-id"
-// NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
-// NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="your-measurement-id"
+// Fungsi untuk mendapatkan konfigurasi dari server
+async function getFirebaseConfig() {
+  const res = await fetch("/api/firebase-config");
+  if (!res.ok) {
+    throw new Error("Failed to fetch Firebase config from server.");
+  }
+  return res.json();
+}
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
+/**
+ * Menginisialisasi aplikasi klien Firebase secara dinamis.
+ * Mengambil konfigurasi dari API route sisi server.
+ * Ini memastikan tidak ada variabel lingkungan sensitif yang terekspos di sisi klien.
+ */
+export async function getFirebaseClient() {
+  if (app && auth && googleProvider) {
+    return { app, auth, googleProvider };
+  }
 
-const googleProvider = new GoogleAuthProvider();
+  const firebaseConfig = await getFirebaseConfig();
 
-export { app, auth, googleProvider };
+  if (!firebaseConfig.apiKey) {
+    throw new Error("Firebase config is missing API key. Make sure server environment variables are set.");
+  }
+
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+
+  return { app, auth, googleProvider };
+}

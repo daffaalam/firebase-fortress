@@ -23,7 +23,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { getFirebaseClient } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/icons";
 import { ChevronDown, LayoutDashboard, LogOut, Users, User } from "lucide-react";
@@ -40,6 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleSignOut = async () => {
     try {
+      const { auth } = await getFirebaseClient();
       await signOut(auth);
       toast({
         title: "Signed Out",
