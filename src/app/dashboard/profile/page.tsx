@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,10 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getGravatarUrl } from "@/lib/utils";
+import { useState } from "react";
+import { auth } from "@/lib/firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { Loader2 } from "lucide-react";
 
 function ProfileDataItem({ label, value }: { label: string; value: string | undefined | null }) {
   return (
@@ -26,6 +30,7 @@ function ProfileDataItem({ label, value }: { label: string; value: string | unde
 export default function ProfilePage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [isPasswordResetLoading, setIsPasswordResetLoading] = useState(false);
 
   const getInitials = (email: string | null | undefined) => {
     if (!email) return "U";
@@ -43,6 +48,34 @@ export default function ProfilePage() {
     });
   };
 
+  const handlePasswordReset = async () => {
+    if (!user || !user.email) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Email pengguna tidak ditemukan.",
+      });
+      return;
+    }
+
+    setIsPasswordResetLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      toast({
+        title: "Email Terkirim",
+        description: "Email pengaturan ulang kata sandi telah dikirim ke " + user.email,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Gagal mengirim email",
+        description: error.message,
+      });
+    } finally {
+      setIsPasswordResetLoading(false);
+    }
+  };
+
   if (!user) {
     return (
       <main className="flex-1 p-4 sm:p-6">
@@ -52,6 +85,7 @@ export default function ProfilePage() {
   }
 
   const avatarUrl = user.photoURL || getGravatarUrl(user.email);
+  const hasPasswordProvider = user.providerData.some((provider) => provider.providerId === "password");
 
   return (
     <main className="flex-1 p-4 sm:p-6">
@@ -106,6 +140,26 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+
+            {hasPasswordProvider && (
+              <div className="space-y-4 rounded-lg border p-4">
+                <h3 className="mb-4 text-lg font-medium">Keamanan</h3>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label className="text-sm font-medium text-muted-foreground">Kata Sandi</Label>
+                  <div className="col-span-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePasswordReset}
+                      disabled={isPasswordResetLoading}
+                    >
+                      {isPasswordResetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Kirim Email Atur Ulang Kata Sandi
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="mb-4 text-lg font-medium">Detail Akun (Hanya Baca)</h3>
@@ -166,3 +220,5 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+    
