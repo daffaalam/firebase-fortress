@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
-import { listUsers } from "@/lib/actions";
-import type { UserRecord } from "@/types";
-import { getGravatarUrl } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Edit, Trash2, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from 'react';
+import { listUsers } from '@/lib/actions';
+import type { UserRecord } from '@/types';
+import { getGravatarUrl } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 export function UserTable() {
   const { toast } = useToast();
@@ -33,11 +33,11 @@ export function UserTable() {
         const userList = await listUsers();
         setUsers(userList);
       } catch (error) {
-        console.error("Failed to fetch users:", error);
+        console.error('Failed to fetch users:', error);
         toast({
-          variant: "destructive",
-          title: "Failed to load users",
-          description: "Could not retrieve the user list from the server.",
+          variant: 'destructive',
+          title: 'Gagal memuat pengguna',
+          description: 'Tidak dapat mengambil daftar pengguna dari server.',
         });
       } finally {
         setLoading(false);
@@ -49,14 +49,14 @@ export function UserTable() {
 
   const handleAction = (action: string, userName: string | undefined) => {
     toast({
-      title: `${action} Action`,
-      description: `Tindakan ${action} untuk ${userName || "pengguna"} tidak diterapkan dalam demo ini.`,
+      title: `Tindakan ${action}`,
+      description: `Tindakan ${action} untuk ${userName || 'pengguna'} tidak diterapkan dalam demo ini.`,
     });
   };
 
   const getInitials = (displayName: string | undefined) => {
-    if (!displayName) return "U";
-    const names = displayName.split(" ");
+    if (!displayName) return 'U';
+    const names = displayName.split(' ');
     if (names.length > 1) {
       return names[0][0] + names[1][0];
     }
@@ -64,9 +64,9 @@ export function UserTable() {
   };
 
   const getRole = (customClaims: { [key: string]: any } | undefined) => {
-    if (customClaims?.admin) return "Admin";
-    if (customClaims?.editor) return "Editor";
-    return "Viewer";
+    if (customClaims?.admin) return 'Admin';
+    if (customClaims?.editor) return 'Editor';
+    return 'Viewer';
   };
 
   if (loading) {
@@ -97,13 +97,13 @@ export function UserTable() {
                     <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{user.displayName || "N/A"}</div>
+                    <div className="font-medium">{user.displayName || 'N/A'}</div>
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="hidden sm:table-cell">
-                <Badge variant={getRole(user.customClaims) === "Admin" ? "default" : "secondary"}>
+                <Badge variant={getRole(user.customClaims) === 'Admin' ? 'default' : 'secondary'}>
                   {getRole(user.customClaims)}
                 </Badge>
               </TableCell>
@@ -119,9 +119,9 @@ export function UserTable() {
                     <DropdownMenuItem
                       onClick={() => {
                         if (user.uid === currentUser?.uid) {
-                          router.push("/dashboard/profile");
+                          router.push('/dashboard/profile');
                         } else {
-                          handleAction("Perbarui", user.displayName);
+                          handleAction('Perbarui', user.displayName);
                         }
                       }}
                     >
@@ -130,7 +130,7 @@ export function UserTable() {
                     </DropdownMenuItem>
                     {user.uid !== currentUser?.uid && (
                       <DropdownMenuItem
-                        onClick={() => handleAction("Hapus", user.displayName)}
+                        onClick={() => handleAction('Hapus', user.displayName)}
                         className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
