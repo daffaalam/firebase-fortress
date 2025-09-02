@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,23 +45,23 @@ export function UserTable() {
   const handleAction = (action: string, userName: string | undefined) => {
     toast({
       title: `${action} Action`,
-      description: `${action} action for ${userName || 'user'} is not implemented in this demo.`,
+      description: `${action} action for ${userName || "user"} is not implemented in this demo.`,
     });
   };
 
   const getInitials = (displayName: string | undefined) => {
     if (!displayName) return "U";
-    const names = displayName.split(' ');
+    const names = displayName.split(" ");
     if (names.length > 1) {
       return names[0][0] + names[1][0];
     }
     return displayName.substring(0, 2).toUpperCase();
   };
-  
+
   const getRole = (customClaims: { [key: string]: any } | undefined) => {
-    if (customClaims?.admin) return 'Admin';
-    if (customClaims?.editor) return 'Editor';
-    return 'Viewer';
+    if (customClaims?.admin) return "Admin";
+    if (customClaims?.editor) return "Editor";
+    return "Viewer";
   };
 
   if (loading) {
@@ -99,13 +92,13 @@ export function UserTable() {
                     <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{user.displayName || 'N/A'}</div>
+                    <div className="font-medium">{user.displayName || "N/A"}</div>
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="hidden sm:table-cell">
-                 <Badge variant={getRole(user.customClaims) === 'Admin' ? 'default' : 'secondary'}>
+                <Badge variant={getRole(user.customClaims) === "Admin" ? "default" : "secondary"}>
                   {getRole(user.customClaims)}
                 </Badge>
               </TableCell>
@@ -118,11 +111,14 @@ export function UserTable() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleAction('Update', user.displayName)}>
+                    <DropdownMenuItem onClick={() => handleAction("Update", user.displayName)}>
                       <Edit className="mr-2 h-4 w-4" />
                       <span>Update Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleAction('Delete', user.displayName)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                    <DropdownMenuItem
+                      onClick={() => handleAction("Delete", user.displayName)}
+                      className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
                       <span>Delete User</span>
                     </DropdownMenuItem>

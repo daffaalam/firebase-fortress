@@ -4,14 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -100,11 +93,7 @@ export function RoleSuggester() {
             )}
           />
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="mr-2 h-4 w-4" />
-            )}
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
             Get Suggestions
           </Button>
         </form>
@@ -120,7 +109,9 @@ export function RoleSuggester() {
               <h3 className="font-semibold text-foreground">Suggested Roles</h3>
               <div className="mt-2 flex flex-wrap gap-2">
                 {result.suggestedRoles.map((role) => (
-                  <Badge key={role} variant="default">{role}</Badge>
+                  <Badge key={role} variant="default">
+                    {role}
+                  </Badge>
                 ))}
               </div>
             </div>

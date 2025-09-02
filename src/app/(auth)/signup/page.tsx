@@ -5,33 +5,17 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
 import { Logo } from "@/components/icons";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-
 
 const formSchema = z.object({
   email: z.string().email({
@@ -65,7 +49,7 @@ export default function SignupPage() {
       });
       router.push("/dashboard");
     } catch (error: any) {
-       toast({
+      toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: error.message,
@@ -84,9 +68,7 @@ export default function SignupPage() {
             <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
           </div>
           <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
-          <CardDescription>
-            Enter your email and password to get started
-          </CardDescription>
+          <CardDescription>Enter your email and password to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

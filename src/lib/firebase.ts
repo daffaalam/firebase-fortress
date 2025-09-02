@@ -27,7 +27,6 @@ const firebaseConfig = {
 // NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
 // NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="your-measurement-id"
 
-
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);

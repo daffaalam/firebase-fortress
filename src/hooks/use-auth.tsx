@@ -1,15 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 interface AuthContextType {
@@ -22,8 +16,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-const protectedRoutes = ['/dashboard'];
-const authRoutes = ['/login', '/signup'];
+const protectedRoutes = ["/dashboard"];
+const authRoutes = ["/login", "/signup"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -39,23 +33,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     if (!loading) {
-      const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+      const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
       const isAuthRoute = authRoutes.includes(pathname);
 
       if (isProtectedRoute && !user) {
-        router.replace('/login');
+        router.replace("/login");
       }
 
       if (isAuthRoute && user) {
-        router.replace('/dashboard');
+        router.replace("/dashboard");
       }
     }
   }, [user, loading, pathname, router]);
 
-  if (loading && protectedRoutes.some(route => pathname.startsWith(route))) {
+  if (loading && protectedRoutes.some((route) => pathname.startsWith(route))) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -63,11 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {

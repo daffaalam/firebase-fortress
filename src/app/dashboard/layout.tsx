@@ -1,11 +1,7 @@
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -32,14 +28,10 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/icons";
 import { Bot, ChevronDown, LayoutDashboard, LogOut, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -68,12 +60,12 @@ export default function DashboardLayout({
   };
 
   const getPageTitle = () => {
-    if (pathname === '/dashboard') return 'Dashboard';
-    if (pathname.startsWith('/dashboard/users')) return 'User Management';
-    if (pathname.startsWith('/dashboard/ai-tools')) return 'AI Tools';
-    return 'Dashboard';
+    if (pathname === "/dashboard") return "Dashboard";
+    if (pathname.startsWith("/dashboard/users")) return "User Management";
+    if (pathname.startsWith("/dashboard/ai-tools")) return "AI Tools";
+    return "Dashboard";
   };
-  
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
@@ -86,7 +78,7 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
+              <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
                 <Link href="/dashboard">
                   <LayoutDashboard />
                   Dashboard
@@ -94,7 +86,7 @@ export default function DashboardLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/users')}>
+              <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard/users")}>
                 <Link href="/dashboard/users">
                   <Users />
                   Users
@@ -102,7 +94,7 @@ export default function DashboardLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/ai-tools')}>
+              <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard/ai-tools")}>
                 <Link href="/dashboard/ai-tools">
                   <Bot />
                   AI Tools
@@ -132,7 +124,10 @@ export default function DashboardLayout({
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

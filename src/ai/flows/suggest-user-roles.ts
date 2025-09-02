@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 /**
  * @fileOverview This file defines a Genkit flow for suggesting user roles based on user profile and activity.
@@ -8,22 +8,22 @@
  * - SuggestUserRolesOutput - The return type for the suggestUserRoles function.
  */
 
-import {ai} from '@/ai/genkit';
+import { ai } from "@/ai/genkit";
 import {
   SuggestUserRolesInputSchema,
   SuggestUserRolesOutputSchema,
   type SuggestUserRolesInput,
   type SuggestUserRolesOutput,
-} from '@/types';
+} from "@/types";
 
 export async function suggestUserRoles(input: SuggestUserRolesInput): Promise<SuggestUserRolesOutput> {
   return suggestUserRolesFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'suggestUserRolesPrompt',
-  input: {schema: SuggestUserRolesInputSchema},
-  output: {schema: SuggestUserRolesOutputSchema},
+  name: "suggestUserRolesPrompt",
+  input: { schema: SuggestUserRolesInputSchema },
+  output: { schema: SuggestUserRolesOutputSchema },
   prompt: `You are an AI assistant that suggests appropriate roles for new users in a Firebase application.
 
   Based on the user's profile and activity, you will suggest a list of roles that are appropriate for them.
@@ -41,12 +41,12 @@ const prompt = ai.definePrompt({
 
 const suggestUserRolesFlow = ai.defineFlow(
   {
-    name: 'suggestUserRolesFlow',
+    name: "suggestUserRolesFlow",
     inputSchema: SuggestUserRolesInputSchema,
     outputSchema: SuggestUserRolesOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );

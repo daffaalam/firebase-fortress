@@ -6,7 +6,7 @@ export default function AiToolsPage() {
   return (
     <main className="flex-1 p-4 sm:p-6">
       <Card className="shadow-lg">
-          <CardHeader>
+        <CardHeader>
           <div className="flex items-center gap-3">
             <Bot className="h-6 w-6 text-primary" />
             <div>
