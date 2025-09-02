@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const protectedRoutes = ['/dashboard'];
-const publicRoutes = ['/login', '/signup'];
+const authRoutes = ['/login', '/signup'];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -43,13 +43,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!loading) {
       const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-      const isPublicRoute = publicRoutes.includes(pathname);
+      const isAuthRoute = authRoutes.includes(pathname);
 
       if (isProtectedRoute && !user) {
         router.replace('/login');
       }
 
-      if (isPublicRoute && user) {
+      if (isAuthRoute && user) {
         router.replace('/dashboard');
       }
     }

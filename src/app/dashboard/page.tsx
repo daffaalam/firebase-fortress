@@ -1,6 +1,5 @@
 import {Card, CardHeader, CardTitle, CardContent} from '@/components/ui/card';
 import {getDashboardStats} from '@/lib/actions';
-import type { DashboardStats } from '@/types';
 import {Users, Activity, ShieldCheck, Sparkles, AlertTriangle} from 'lucide-react';
 import {
   Alert,

@@ -1,4 +1,4 @@
-import { UserTable } from "@/components/dashboard/user-table";
+import { UserTable } from "@/components/dashboard/users/user-table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Users } from "lucide-react";
 
