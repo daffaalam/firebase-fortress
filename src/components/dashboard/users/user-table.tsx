@@ -1,9 +1,16 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { listUsers } from "@/lib/actions";
@@ -36,6 +43,13 @@ export function UserTable() {
     fetchUsers();
   }, [toast]);
 
+  const handleAction = (action: string, userName: string | undefined) => {
+    toast({
+      title: `${action} Action`,
+      description: `Tindakan ${action} untuk ${userName || "pengguna"} tidak diterapkan dalam demo ini.`,
+    });
+  };
+
   const getInitials = (displayName: string | undefined) => {
     if (!displayName) return "U";
     const names = displayName.split(" ");
@@ -64,8 +78,9 @@ export function UserTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead className="hidden sm:table-cell">Role</TableHead>
+            <TableHead>Pengguna</TableHead>
+            <TableHead className="hidden sm:table-cell">Peran</TableHead>
+            <TableHead className="text-right">Tindakan</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -87,6 +102,29 @@ export function UserTable() {
                 <Badge variant={getRole(user.customClaims) === "Admin" ? "default" : "secondary"}>
                   {getRole(user.customClaims)}
                 </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Tindakan Pengguna</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleAction("Perbarui", user.displayName)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      <span>Perbarui Profil</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleAction("Hapus", user.displayName)}
+                      className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      <span>Hapus Pengguna</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
