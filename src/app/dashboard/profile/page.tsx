@@ -39,9 +39,6 @@ export default function ProfilePage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // This is a placeholder for the update logic.
-    // In a real application, you would call a server action
-    // or an API endpoint to update the user's profile in Firebase.
     toast({
       title: "Fungsi Belum Diimplementasikan",
       description: "Kemampuan untuk memperbarui profil belum diimplementasikan dalam demo ini.",
@@ -61,6 +58,12 @@ export default function ProfilePage() {
     setIsPasswordResetLoading(true);
     try {
       const { auth } = await getFirebaseClient();
+
+      // Important: Check if the auth object was successfully initialized.
+      if (!auth) {
+        throw new Error("Koneksi ke layanan otentikasi gagal. Muat ulang halaman dan coba lagi.");
+      }
+
       await sendPasswordResetEmail(auth, user.email);
       toast({
         title: "Email Terkirim",

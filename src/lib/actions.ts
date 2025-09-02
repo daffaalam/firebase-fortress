@@ -27,6 +27,11 @@ export async function createUser(formData: FormData) {
 }
 
 export async function listUsers(): Promise<UserRecord[]> {
+  // If the key is not available (e.g., during build), return an empty array.
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    console.log("Build environment detected or service key missing. Returning empty user list.");
+    return [];
+  }
   try {
     await initializeAdminApp();
     const userRecords = await adminAuth().listUsers();
@@ -34,7 +39,9 @@ export async function listUsers(): Promise<UserRecord[]> {
     return JSON.parse(JSON.stringify(userRecords.users));
   } catch (error) {
     console.error("Error listing users:", error);
-    throw new Error("Gagal memuat daftar pengguna.");
+    // Instead of throwing, return an empty array to prevent build/runtime crashes.
+    // The dashboard page already has a warning for when the service account is missing.
+    return [];
   }
 }
 
