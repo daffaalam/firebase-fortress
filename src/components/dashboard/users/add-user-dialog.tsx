@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Dialog,
@@ -7,14 +7,14 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
-import { createUser } from '@/lib/actions';
-import { Loader2 } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { createUser } from "@/lib/actions";
+import { Loader2 } from "lucide-react";
 
 interface AddUserDialogProps {
   open: boolean;
@@ -25,21 +25,21 @@ interface AddUserDialogProps {
 export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialogProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
     if (!email) {
-      newErrors.email = 'Email diperlukan.';
+      newErrors.email = "Email diperlukan.";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Alamat email tidak valid.';
+      newErrors.email = "Alamat email tidak valid.";
     }
     if (!password) {
-      newErrors.password = 'Kata sandi diperlukan.';
+      newErrors.password = "Kata sandi diperlukan.";
     } else if (password.length < 6) {
-      newErrors.password = 'Kata sandi harus minimal 6 karakter.';
+      newErrors.password = "Kata sandi harus minimal 6 karakter.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -53,27 +53,27 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
 
     setIsLoading(true);
     const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
+    formData.append("email", email);
+    formData.append("password", password);
 
     const result = await createUser(formData);
     setIsLoading(false);
 
     if (result.success) {
       toast({
-        title: 'Pengguna Dibuat',
+        title: "Pengguna Dibuat",
         description: `Pengguna baru dengan email ${email} telah berhasil dibuat.`,
       });
       onUserAdded();
       onOpenChange(false);
-      setEmail('');
-      setPassword('');
+      setEmail("");
+      setPassword("");
       setErrors({});
     } else {
       toast({
-        variant: 'destructive',
-        title: 'Gagal Membuat Pengguna',
-        description: result.error || 'Terjadi kesalahan yang tidak diketahui.',
+        variant: "destructive",
+        title: "Gagal Membuat Pengguna",
+        description: result.error || "Terjadi kesalahan yang tidak diketahui.",
       });
     }
   };

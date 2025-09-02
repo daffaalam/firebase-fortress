@@ -171,15 +171,15 @@ export default function ProfilePage() {
                 />
                 <ProfileDataItem
                   label="Terakhir Masuk"
-                  value={
-                    user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"
-                  }
+                  value={user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"}
                 />
                 <div className="grid grid-cols-3 items-center gap-4">
                   <Label className="text-sm font-medium text-muted-foreground">Status Verifikasi</Label>
                   <div className="col-span-2 flex items-center gap-2">
                     <Switch id="emailVerified" checked={user.emailVerified} disabled />
-                    <Label htmlFor="emailVerified">{user.emailVerified ? "Terverifikasi" : "Belum Terverifikasi"}</Label>
+                    <Label htmlFor="emailVerified">
+                      {user.emailVerified ? "Terverifikasi" : "Belum Terverifikasi"}
+                    </Label>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 items-center gap-4">
@@ -220,5 +220,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
-    

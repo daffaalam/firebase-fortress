@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { UserTable } from '@/components/dashboard/users/user-table';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Users, PlusCircle } from 'lucide-react';
-import { AddUserDialog } from '@/components/dashboard/users/add-user-dialog';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { UserTable } from "@/components/dashboard/users/user-table";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Users, PlusCircle } from "lucide-react";
+import { AddUserDialog } from "@/components/dashboard/users/add-user-dialog";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export default function UsersPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function UsersPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <UserTable key={refreshUsers ? 'refresh' : 'initial'} />
+          <UserTable key={refreshUsers ? "refresh" : "initial"} />
         </CardContent>
       </Card>
     </main>
