@@ -1,20 +1,9 @@
 "use server";
 
-import { suggestUserRoles } from "@/ai/flows/suggest-user-roles";
 import { auth as adminAuth } from "firebase-admin";
 import { initializeAdminApp } from "./firebase-admin";
 import { isToday } from "date-fns";
-import type { SuggestUserRolesInput, SuggestUserRolesOutput, DashboardStats, UserRecord } from "@/types";
-
-export async function getRoleSuggestions(input: SuggestUserRolesInput): Promise<SuggestUserRolesOutput> {
-  try {
-    const output = await suggestUserRoles(input);
-    return output;
-  } catch (error) {
-    console.error("Error in getRoleSuggestions:", error);
-    throw new Error("Failed to get role suggestions from AI.");
-  }
-}
+import type { DashboardStats, UserRecord } from "@/types";
 
 export async function listUsers(): Promise<UserRecord[]> {
   try {

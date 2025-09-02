@@ -26,7 +26,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/icons";
-import { Bot, ChevronDown, LayoutDashboard, LogOut, Users } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -62,7 +62,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const getPageTitle = () => {
     if (pathname === "/dashboard") return "Dashboard";
     if (pathname.startsWith("/dashboard/users")) return "User Management";
-    if (pathname.startsWith("/dashboard/ai-tools")) return "AI Tools";
     return "Dashboard";
   };
 
@@ -90,14 +89,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link href="/dashboard/users">
                   <Users />
                   Users
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard/ai-tools")}>
-                <Link href="/dashboard/ai-tools">
-                  <Bot />
-                  AI Tools
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

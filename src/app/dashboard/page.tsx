@@ -26,7 +26,6 @@ export default async function DashboardPage() {
     { title: "Total Users", value: stats.totalUsers, Icon: Users },
     { title: "Active Today", value: stats.activeToday, Icon: Activity },
     { title: "Roles Defined", value: stats.rolesDefined, Icon: ShieldCheck },
-    { title: "AI Suggestions", value: stats.aiSuggestions, Icon: Sparkles },
   ];
 
   return (
@@ -46,7 +45,7 @@ export default async function DashboardPage() {
           </AlertDescription>
         </Alert>
       )}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {statItems.map(({ title, value, Icon }) => (
           <StatCard key={title} title={title} value={value} Icon={Icon} />
         ))}
