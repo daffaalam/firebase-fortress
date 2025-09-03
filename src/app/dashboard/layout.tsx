@@ -42,6 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleSignOut = async () => {
     try {
       const { auth } = await getFirebaseClient();
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
       await signOut(auth);
       window.localStorage.removeItem("emailForSignIn");
       toast({

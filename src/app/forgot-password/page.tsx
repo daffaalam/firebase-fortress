@@ -48,11 +48,12 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
-      await sendPasswordResetEmail(auth!, values.email, actionCodeSettings);
+      await sendPasswordResetEmail(auth, values.email, actionCodeSettings);
       toast({
         title: t("forgotPassword.success.title"),
         description: t("forgotPassword.success.description", { email: values.email }),

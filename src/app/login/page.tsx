@@ -78,10 +78,11 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      const userCredential = await signInWithEmailAndPassword(auth!, values.email, values.password);
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
 
       if (!userCredential.user.emailVerified) {
-        await signOut(auth!);
+        await signOut(auth);
         toast({
           variant: "destructive",
           title: t("login.error.emailVerification.title"),
@@ -111,11 +112,12 @@ export default function LoginPage() {
     setIsPasswordlessLoading(true);
     try {
       const { auth } = await getFirebaseClient();
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
-      await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
+      await sendSignInLinkToEmail(auth, values.email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", values.email);
       toast({
         title: t("login.success.linkSent.title"),
@@ -136,7 +138,8 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
       const { auth, googleProvider } = await getFirebaseClient();
-      await signInWithPopup(auth!, googleProvider!);
+      if (!auth || !googleProvider) throw new Error("Koneksi ke layanan otentikasi Google gagal.");
+      await signInWithPopup(auth, googleProvider);
       toast({
         title: t("login.success.title"),
         description: t("login.success.google"),

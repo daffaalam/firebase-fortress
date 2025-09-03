@@ -54,7 +54,8 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      const userCredential = await createUserWithEmailAndPassword(auth!, values.email, values.password);
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,

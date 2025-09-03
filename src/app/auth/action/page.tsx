@@ -47,7 +47,8 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
     const handleVerifyCode = async () => {
       try {
         const { auth } = await getFirebaseClient();
-        await verifyPasswordResetCode(auth!, actionCode);
+        if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+        await verifyPasswordResetCode(auth, actionCode);
         setStatus("valid");
       } catch (error: any) {
         let message = t("resetPassword.error.genericVerification");
@@ -75,7 +76,8 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      await confirmPasswordReset(auth!, actionCode, values.password);
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+      await confirmPasswordReset(auth, actionCode, values.password);
       toast({
         title: t("resetPassword.success.title"),
         description: t("resetPassword.success.description"),
@@ -160,6 +162,7 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
     const handleVerify = async () => {
       try {
         const { auth } = await getFirebaseClient();
+        if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
         await applyActionCode(auth, actionCode);
         setStatus("success");
         toast({
@@ -219,7 +222,15 @@ function SignIn() {
     useEffect(() => {
       const handleEmailLinkSignIn = async () => {
         const { auth } = await getFirebaseClient();
-        if (!auth) return;
+        if (!auth) {
+            toast({
+                variant: "destructive",
+                title: t("login.error.title"),
+                description: "Koneksi ke layanan otentikasi gagal.",
+            });
+            router.push("/login");
+            return;
+        }
   
         if (isSignInWithEmailLink(auth, window.location.href)) {
           let email = window.localStorage.getItem("emailForSignIn");
