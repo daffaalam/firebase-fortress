@@ -6,7 +6,15 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+} from "firebase/auth";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -16,7 +24,6 @@ import { useToast } from "@/hooks/use-toast";
 import { getFirebaseClient } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon, Logo } from "@/components/icons";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
@@ -28,17 +35,71 @@ const formSchema = z.object({
   }),
 });
 
+const passwordlessFormSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+});
+
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
+  const [isHandlingLink, setIsHandlingLink] = useState(true);
+
+  // Handle the email link sign-in on component mount
+  useEffect(() => {
+    const handleEmailLinkSignIn = async () => {
+      const { auth } = await getFirebaseClient();
+      if (!auth) {
+        setIsHandlingLink(false);
+        return;
+      }
+
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        let email = window.localStorage.getItem("emailForSignIn");
+        if (!email) {
+          email = window.prompt("Please provide your email for confirmation");
+        }
+
+        if (email) {
+          try {
+            await signInWithEmailLink(auth, email, window.location.href);
+            window.localStorage.removeItem("emailForSignIn");
+            toast({
+              title: "Success",
+              description: "You have successfully signed in.",
+            });
+            router.push("/dashboard");
+          } catch (error: any) {
+            toast({
+              variant: "destructive",
+              title: "Sign-in Failed",
+              description: "The sign-in link is invalid or has expired.",
+            });
+          }
+        }
+      }
+      setIsHandlingLink(false);
+    };
+
+    handleEmailLinkSignIn();
+  }, [router, toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+    },
+  });
+
+  const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
+    resolver: zodResolver(passwordlessFormSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -75,6 +136,31 @@ export default function LoginPage() {
     }
   }
 
+  async function onPasswordlessSubmit(values: z.infer<typeof passwordlessFormSchema>) {
+    setIsPasswordlessLoading(true);
+    try {
+      const { auth } = await getFirebaseClient();
+      const actionCodeSettings = {
+        url: window.location.href, // Redirect back to the same page
+        handleCodeInApp: true,
+      };
+      await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
+      window.localStorage.setItem("emailForSignIn", values.email);
+      toast({
+        title: "Sign-in Link Sent",
+        description: `A sign-in link has been sent to ${values.email}. Check your inbox.`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message,
+      });
+    } finally {
+      setIsPasswordlessLoading(false);
+    }
+  }
+
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
     try {
@@ -94,6 +180,15 @@ export default function LoginPage() {
     } finally {
       setIsGoogleLoading(false);
     }
+  }
+
+  if (isHandlingLink) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="ml-4 text-muted-foreground">Verifying sign-in link...</p>
+      </div>
+    );
   }
 
   return (
@@ -144,7 +239,7 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || isPasswordlessLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign In
               </Button>
@@ -154,7 +249,41 @@ export default function LoginPage() {
           <div className="relative my-6">
             <Separator />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              OR CONTINUE WITH
+              OR
+            </div>
+          </div>
+
+          <Form {...passwordlessForm}>
+            <form onSubmit={passwordlessForm.handleSubmit(onPasswordlessSubmit)} className="space-y-4">
+              <FormField
+                control={passwordlessForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sign in with Email Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="name@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                className="w-full"
+                disabled={isLoading || isPasswordlessLoading || isGoogleLoading}
+              >
+                {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Send Sign-in Link
+              </Button>
+            </form>
+          </Form>
+
+          <div className="relative my-6">
+            <Separator />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
+              OR
             </div>
           </div>
 
