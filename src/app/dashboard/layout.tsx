@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -42,6 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     try {
       const { auth } = await getFirebaseClient();
       await signOut(auth);
+      window.localStorage.removeItem("emailForSignIn");
       toast({
         title: "Signed Out",
         description: "You have been successfully signed out.",
