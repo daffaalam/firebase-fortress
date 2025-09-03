@@ -26,6 +26,10 @@
   "login.success.linkSent.description": "A sign-in link has been sent to {{email}}. Check your inbox.",
   "login.error.invalidLink": "The sign-in link is invalid or has expired.",
   "login.verifyingLink": "Verifying sign-in link...",
+  "login.error.invalidCredential": "The email or password you entered is incorrect.",
+  "login.error.userDisabled": "This account has been disabled.",
+  "login.error.popupClosed": "The sign-in pop-up was closed before authentication could complete. Please try again.",
+  "login.error.accountExistsWithDifferentCredential": "An account already exists with the same email address but different sign-in credentials. Please sign in using the original method.",
 
   "signup.title": "Create an Account",
   "signup.description": "Enter your email and password to get started",
@@ -33,6 +37,8 @@
   "signup.hasAccount": "Already have an account?",
   "signup.success.title": "Account Created & Verification Email Sent",
   "signup.success.description": "Your account has been created. Please check your email to verify your account before logging in.",
+  "signup.error.title": "Registration Failed",
+  "signup.error.emailAlreadyInUse": "This email is already in use. Please sign in or use a different email.",
 
   "forgotPassword.title": "Forgot Password?",
   "forgotPassword.description": "No worries! Enter your email and we'll send you a reset link.",
