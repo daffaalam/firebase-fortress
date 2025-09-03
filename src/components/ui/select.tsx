@@ -139,7 +139,7 @@ const LanguageSwitcher = () => {
     <div className="absolute top-4 right-4">
       <Select onValueChange={(value: "id" | "en") => setLanguage(value)} defaultValue={language}>
         <SelectTrigger className="w-[120px]">
-          <SelectValue placeholder={t('language')} />
+          <SelectValue placeholder={t("language")} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="id">Indonesia</SelectItem>
@@ -164,5 +164,5 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
-  LanguageSwitcher
+  LanguageSwitcher,
 };

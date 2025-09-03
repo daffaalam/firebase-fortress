@@ -1,4 +1,3 @@
-
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -157,8 +156,7 @@ export default function LoginPage() {
   }
 
   const title = t("login.title");
-  const description =
-    signInMethod === "emailLink" ? t("login.description.emailLink") : t("login.description.password");
+  const description = signInMethod === "emailLink" ? t("login.description.emailLink") : t("login.description.password");
 
   return (
     <AuthLayout title={title} description={description}>
@@ -178,11 +176,7 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isPasswordlessLoading || isGoogleLoading || isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isPasswordlessLoading || isGoogleLoading || isLoading}>
               {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t("login.sendSignInLink")}
             </Button>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -133,7 +132,7 @@ export default function ProfilePage() {
       if (!auth) {
         throw new Error("Koneksi ke layanan otentikasi gagal. Muat ulang halaman dan coba lagi.");
       }
-      
+
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
@@ -248,7 +247,9 @@ export default function ProfilePage() {
               <FloatingLabelInput
                 id="creationTime"
                 label="Waktu Pembuatan"
-                defaultValue={user.metadata.creationTime ? format(new Date(user.metadata.creationTime), "PPP p") : "N/A"}
+                defaultValue={
+                  user.metadata.creationTime ? format(new Date(user.metadata.creationTime), "PPP p") : "N/A"
+                }
                 disabled
               />
               <FloatingLabelInput

@@ -1,9 +1,14 @@
-
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState, useMemo } from "react";
-import { applyActionCode, confirmPasswordReset, isSignInWithEmailLink, signInWithEmailLink, verifyPasswordResetCode } from "firebase/auth";
+import {
+  applyActionCode,
+  confirmPasswordReset,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+  verifyPasswordResetCode,
+} from "firebase/auth";
 import Link from "next/link";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -156,7 +161,7 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const isEmailChange = mode === 'recoverEmail' || mode === 'verifyAndChangeEmail';
+  const isEmailChange = mode === "recoverEmail" || mode === "verifyAndChangeEmail";
 
   useEffect(() => {
     const handleVerify = async () => {
@@ -166,13 +171,15 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
         await applyActionCode(auth, actionCode);
         setStatus("success");
         toast({
-            title: isEmailChange ? t("verifyEmailChange.successToast.title") : t("verifyEmail.successToast.title"),
-            description: isEmailChange ? t("verifyEmailChange.successToast.description") : t("verifyEmail.successToast.description"),
+          title: isEmailChange ? t("verifyEmailChange.successToast.title") : t("verifyEmail.successToast.title"),
+          description: isEmailChange
+            ? t("verifyEmailChange.successToast.description")
+            : t("verifyEmail.successToast.description"),
         });
       } catch (error: any) {
         let message = isEmailChange ? t("verifyEmailChange.error.failed") : t("verifyEmail.error.failed");
         if (error.code === "auth/invalid-action-code") {
-            message = isEmailChange ? t("verifyEmailChange.error.invalidCode") : t("verifyEmail.error.invalidCode");
+          message = isEmailChange ? t("verifyEmailChange.error.invalidCode") : t("verifyEmail.error.invalidCode");
         }
         setErrorMessage(message);
         setStatus("error");
@@ -185,7 +192,9 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
     return (
       <>
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        <p className="text-muted-foreground">{isEmailChange ? t("verifyEmailChange.waitMessage") : t("verifyEmail.waitMessage")}</p>
+        <p className="text-muted-foreground">
+          {isEmailChange ? t("verifyEmailChange.waitMessage") : t("verifyEmail.waitMessage")}
+        </p>
       </>
     );
   }
@@ -194,84 +203,90 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
     return (
       <>
         <CheckCircle className="h-16 w-16 text-green-500" />
-        <p className="text-muted-foreground">{isEmailChange ? t("verifyEmailChange.successMessage") : t("verifyEmail.successMessage")}</p>
+        <p className="text-muted-foreground">
+          {isEmailChange ? t("verifyEmailChange.successMessage") : t("verifyEmail.successMessage")}
+        </p>
         <Button asChild className="w-full">
-          <Link href={isEmailChange ? "/dashboard/profile" : "/login"}>{isEmailChange ? t("verifyEmailChange.backToProfile") : t("verifyEmail.continueToLogin")}</Link>
+          <Link href={isEmailChange ? "/dashboard/profile" : "/login"}>
+            {isEmailChange ? t("verifyEmailChange.backToProfile") : t("verifyEmail.continueToLogin")}
+          </Link>
         </Button>
       </>
     );
   }
-  
+
   return (
-      <>
-        <XCircle className="h-16 w-16 text-destructive" />
-        <p className="text-center text-destructive">{errorMessage}</p>
-        <Button asChild className="w-full" variant="outline">
-          <Link href={isEmailChange ? "/dashboard/profile" : "/login"}>{isEmailChange ? t("verifyEmailChange.backToProfile") : t("verifyEmail.backToLogin")}</Link>
-        </Button>
-      </>
-  )
+    <>
+      <XCircle className="h-16 w-16 text-destructive" />
+      <p className="text-center text-destructive">{errorMessage}</p>
+      <Button asChild className="w-full" variant="outline">
+        <Link href={isEmailChange ? "/dashboard/profile" : "/login"}>
+          {isEmailChange ? t("verifyEmailChange.backToProfile") : t("verifyEmail.backToLogin")}
+        </Link>
+      </Button>
+    </>
+  );
 }
 
 // --- SignIn Component ---
 function SignIn() {
-    const router = useRouter();
-    const { toast } = useToast();
-    const { t } = useLanguage();
-  
-    useEffect(() => {
-      const handleEmailLinkSignIn = async () => {
-        const { auth } = await getFirebaseClient();
-        if (!auth) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    const handleEmailLinkSignIn = async () => {
+      const { auth } = await getFirebaseClient();
+      if (!auth) {
+        toast({
+          variant: "destructive",
+          title: t("login.error.title"),
+          description: "Koneksi ke layanan otentikasi gagal.",
+        });
+        router.push("/login");
+        return;
+      }
+
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        let email = window.localStorage.getItem("emailForSignIn");
+        if (!email) {
+          email = window.prompt(t("login.emailPlaceholder"));
+        }
+
+        if (email) {
+          try {
+            await signInWithEmailLink(auth, email, window.location.href);
+            window.localStorage.removeItem("emailForSignIn");
             toast({
-                variant: "destructive",
-                title: t("login.error.title"),
-                description: "Koneksi ke layanan otentikasi gagal.",
+              title: t("login.success.title"),
+              description: t("login.success.description"),
+            });
+            router.push("/dashboard");
+          } catch (error: any) {
+            toast({
+              variant: "destructive",
+              title: t("login.error.title"),
+              description: t("login.error.invalidLink"),
             });
             router.push("/login");
-            return;
-        }
-  
-        if (isSignInWithEmailLink(auth, window.location.href)) {
-          let email = window.localStorage.getItem("emailForSignIn");
-          if (!email) {
-            email = window.prompt(t("login.emailPlaceholder"));
-          }
-  
-          if (email) {
-            try {
-              await signInWithEmailLink(auth, email, window.location.href);
-              window.localStorage.removeItem("emailForSignIn");
-              toast({
-                title: t("login.success.title"),
-                description: t("login.success.description"),
-              });
-              router.push("/dashboard");
-            } catch (error: any) {
-              toast({
-                variant: "destructive",
-                title: t("login.error.title"),
-                description: t("login.error.invalidLink"),
-              });
-              router.push("/login");
-            }
-          } else {
-             router.push("/login");
           }
         } else {
-             router.push("/login");
+          router.push("/login");
         }
-      };
-  
-      handleEmailLinkSignIn();
-    }, [router, toast, t]);
-  
-    return (
-        <>
-            <Loader2 className="h-16 w-16 animate-spin text-primary" />
-            <p className="text-muted-foreground">{t("login.verifyingLink")}</p>
-        </>
-    )
+      } else {
+        router.push("/login");
+      }
+    };
+
+    handleEmailLinkSignIn();
+  }, [router, toast, t]);
+
+  return (
+    <>
+      <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      <p className="text-muted-foreground">{t("login.verifyingLink")}</p>
+    </>
+  );
 }
 
 function ActionHandler() {
@@ -287,7 +302,7 @@ function ActionHandler() {
       case "verifyEmail":
         return t("verifyEmail.title");
       case "recoverEmail":
-      case 'verifyAndChangeEmail':
+      case "verifyAndChangeEmail":
         return t("verifyEmailChange.title");
       case "signIn":
         return t("login.title");
@@ -298,29 +313,27 @@ function ActionHandler() {
 
   const getDescription = () => {
     switch (mode) {
-        case "resetPassword":
-          return t("resetPassword.description.form");
-        case "verifyEmail":
-          return t("verifyEmail.description.verifying");
-        case "recoverEmail":
-        case 'verifyAndChangeEmail':
-          return t("verifyEmailChange.description.verifying");
-        case "signIn":
-          return t("login.description.emailLink");
-        default:
-          return "";
-      }
-  }
+      case "resetPassword":
+        return t("resetPassword.description.form");
+      case "verifyEmail":
+        return t("verifyEmail.description.verifying");
+      case "recoverEmail":
+      case "verifyAndChangeEmail":
+        return t("verifyEmailChange.description.verifying");
+      case "signIn":
+        return t("login.description.emailLink");
+      default:
+        return "";
+    }
+  };
 
   const renderContent = () => {
     if (!mode || !actionCode) {
-        // This could be an email link sign-in, which doesn't have an actionCode in the same way.
-        if (mode === 'signIn' || (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href))) {
-            return <SignIn />;
-        }
-      return (
-        <p className="text-destructive text-center">{t("resetPassword.error.invalidLink")}</p>
-      );
+      // This could be an email link sign-in, which doesn't have an actionCode in the same way.
+      if (mode === "signIn" || (typeof window !== "undefined" && isSignInWithEmailLink(window.location.href))) {
+        return <SignIn />;
+      }
+      return <p className="text-destructive text-center">{t("resetPassword.error.invalidLink")}</p>;
     }
 
     switch (mode) {
@@ -328,7 +341,7 @@ function ActionHandler() {
         return <ResetPassword actionCode={actionCode} />;
       case "verifyEmail":
       case "recoverEmail":
-      case 'verifyAndChangeEmail':
+      case "verifyAndChangeEmail":
         return <VerifyEmail actionCode={actionCode} mode={mode} />;
       default:
         return <p className="text-destructive text-center">Tindakan tidak didukung.</p>;

@@ -20,10 +20,7 @@ export function GET() {
     !config.appId
   ) {
     console.error("Firebase config environment variables are not fully set.");
-    return NextResponse.json(
-      { error: "Server configuration is incomplete." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Server configuration is incomplete." }, { status: 500 });
   }
 
   return NextResponse.json(config);
