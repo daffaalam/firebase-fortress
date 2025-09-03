@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { listUsers } from "@/lib/actions";
+import { listUsers } from "@/lib/actions/user.actions";
 import type { UserRecord } from "@/types";
 import { getGravatarUrl } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";

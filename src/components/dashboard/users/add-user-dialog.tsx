@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { createUser } from "@/lib/actions";
+import { createUser } from "@/lib/actions/user.actions";
 import { Loader2 } from "lucide-react";
 
 interface AddUserDialogProps {

@@ -1,9 +1,9 @@
+
 "use server";
 
 import { auth as adminAuth } from "firebase-admin";
-import { initializeAdminApp } from "./firebase-admin";
-import { isToday } from "date-fns";
-import type { DashboardStats, UserRecord } from "@/types";
+import { initializeAdminApp } from "../firebase-admin";
+import type { UserRecord } from "@/types";
 import { z } from "zod";
 
 const CreateUserSchema = z.object({
@@ -42,27 +42,5 @@ export async function listUsers(): Promise<UserRecord[]> {
     // Instead of throwing, return an empty array to prevent build/runtime crashes.
     // The dashboard page already has a warning for when the service account is missing.
     return [];
-  }
-}
-
-export async function getDashboardStats(): Promise<DashboardStats> {
-  try {
-    const users = await listUsers();
-    const totalUsers = users.length;
-    const activeToday = users.filter(
-      (user) => user.metadata.lastSignInTime && isToday(new Date(user.metadata.lastSignInTime)),
-    ).length;
-
-    return {
-      totalUsers,
-      activeToday,
-    };
-  } catch (error) {
-    console.error("Error getting dashboard stats:", error);
-    // Return zeroed stats on error
-    return {
-      totalUsers: 0,
-      activeToday: 0,
-    };
   }
 }
