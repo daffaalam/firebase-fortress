@@ -289,6 +289,19 @@ function ActionHandler() {
   const { t } = useLanguage();
   const mode = searchParams.get("mode");
   const actionCode = searchParams.get("oobCode");
+  const [isSignInLink, setIsSignInLink] = useState(false);
+
+  useEffect(() => {
+    const checkSignInLink = async () => {
+      const { auth } = await getFirebaseClient();
+      if (auth && isSignInWithEmailLink(auth, window.location.href)) {
+        setIsSignInLink(true);
+      }
+    };
+    if (typeof window !== "undefined") {
+      checkSignInLink();
+    }
+  }, []);
 
   const getTitle = () => {
     switch (mode) {
@@ -323,10 +336,12 @@ function ActionHandler() {
   };
 
   const renderContent = () => {
+    // This case handles passwordless sign-in, which doesn't have mode/oobCode in the same way initially.
+    if (isSignInLink) {
+      return <SignIn />;
+    }
+
     if (!mode || !actionCode) {
-      if (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href, getFirebaseClient().auth)) {
-        return <SignIn />;
-      }
       return <p className="text-destructive text-center">{t("resetPassword.error.invalidLink")}</p>;
     }
 
@@ -338,9 +353,6 @@ function ActionHandler() {
       case "verifyAndChangeEmail":
         return <VerifyEmail actionCode={actionCode} mode={mode} />;
       default:
-        if (mode === "signIn") {
-          return <SignIn />;
-        }
         return <p className="text-destructive text-center">Tindakan tidak didukung.</p>;
     }
   };

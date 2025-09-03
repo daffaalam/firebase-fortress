@@ -63,7 +63,7 @@ export function UserTable() {
     return displayName.substring(0, 2).toUpperCase();
   };
 
-  const getRole = (customClaims: { [key: string]: any } | undefined) => {
+  const getRole = (customClaims: { [key: string]: unknown } | undefined) => {
     if (customClaims?.admin) return "Admin";
     if (customClaims?.editor) return "Editor";
     return "Viewer";
