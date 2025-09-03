@@ -135,7 +135,7 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <Separator />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-sm text-muted-foreground">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
               OR CONTINUE WITH
             </div>
           </div>
