@@ -52,7 +52,7 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(auth!, values.email, values.password);
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
