@@ -38,22 +38,7 @@ export default function LoginPage() {
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
   const form = useForm<z.infer<typeof passwordFormSchema>>({
-    resolver: zodResolver(passwordFormSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-      if (val.password.length < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.password.required"),
-          path: ["password"],
-        });
-      }
-    })),
+    resolver: zodResolver(passwordFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -61,15 +46,7 @@ export default function LoginPage() {
   });
 
   const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
-    resolver: zodResolver(passwordlessFormSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-    })),
+    resolver: zodResolver(passwordlessFormSchema),
     defaultValues: {
       email: "",
     },
