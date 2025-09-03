@@ -128,22 +128,21 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-4 rounded-lg border p-4">
+            <div className="space-y-6 rounded-lg border p-4">
               <h3 className="mb-6 text-lg font-medium">Informasi Profil</h3>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24">
                   <AvatarImage src={avatarUrl} alt={user.displayName ?? "Pengguna"} />
                   <AvatarFallback className="text-3xl">{getInitials(user.email)}</AvatarFallback>
                 </Avatar>
-                <div className="flex-grow">
-                  <FloatingLabelInput
-                    id="displayName"
-                    label="Nama Tampilan"
-                    defaultValue={user.displayName || ""}
-                    placeholder="Nama lengkap Anda"
-                  />
-                </div>
               </div>
+
+              <FloatingLabelInput
+                id="displayName"
+                label="Nama Tampilan"
+                defaultValue={user.displayName || ""}
+                placeholder="Nama lengkap Anda"
+              />
               <FloatingLabelInput
                 id="photoURL"
                 label="URL Avatar"
@@ -235,5 +234,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
-    
