@@ -28,6 +28,8 @@
   "login.verifyingLink": "Memverifikasi tautan masuk...",
   "login.error.invalidCredential": "Email atau kata sandi yang Anda masukkan salah.",
   "login.error.userDisabled": "Akun ini telah dinonaktifkan.",
+  "login.error.popupClosed": "Pop-up masuk ditutup sebelum otentikasi dapat diselesaikan. Silakan coba lagi.",
+  "login.error.accountExistsWithDifferentCredential": "Akun sudah ada dengan alamat email yang sama tetapi kredensial masuk yang berbeda. Silakan masuk menggunakan metode asli.",
 
   "signup.title": "Buat Akun",
   "signup.description": "Masukkan email dan kata sandi Anda untuk memulai",
@@ -35,6 +37,8 @@
   "signup.hasAccount": "Sudah punya akun?",
   "signup.success.title": "Akun Dibuat & Email Verifikasi Terkirim",
   "signup.success.description": "Akun Anda telah dibuat. Silakan periksa email Anda untuk memverifikasi akun Anda sebelum masuk.",
+  "signup.error.title": "Pendaftaran Gagal",
+  "signup.error.emailAlreadyInUse": "Email ini sudah digunakan. Silakan masuk atau gunakan email yang berbeda.",
 
   "forgotPassword.title": "Lupa Kata Sandi?",
   "forgotPassword.description": "Jangan khawatir! Masukkan email Anda dan kami akan mengirimkan tautan reset.",
