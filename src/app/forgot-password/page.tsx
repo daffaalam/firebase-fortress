@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getFirebaseClient } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { AuthLayout } from "@/components/layout/auth-layout";
+import { AuthLayout } from "@/features/auth/components/auth-layout";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({

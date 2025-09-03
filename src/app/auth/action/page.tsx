@@ -21,7 +21,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ActionLayout } from "@/components/layout/auth-layout";
+import { ActionLayout } from "@/features/auth/components/auth-layout";
 
 const resetPasswordSchema = z
   .object({

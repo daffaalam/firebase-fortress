@@ -1,9 +1,9 @@
 "use client";
 
-import { UserTable } from "@/components/dashboard/users/user-table";
+import { UserTable } from "@/features/dashboard/components/users/user-table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Users, PlusCircle } from "lucide-react";
-import { AddUserDialog } from "@/components/dashboard/users/add-user-dialog";
+import { AddUserDialog } from "@/features/dashboard/components/users/add-user-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 

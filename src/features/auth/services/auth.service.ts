@@ -10,11 +10,12 @@ import {
   updateProfile,
   verifyBeforeUpdateEmail,
   sendPasswordResetEmail,
+  UserProfile,
 } from "firebase/auth";
 import { getFirebaseClient } from "@/lib/firebase";
 
 export const authService = {
-  async signInWithEmail(email, password) {
+  async signInWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
       if (!auth) throw new Error("Authentication service not available.");
@@ -26,12 +27,12 @@ export const authService = {
       }
 
       return { success: true, user: userCredential.user };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
 
-  async sendPasswordlessLink(email) {
+  async sendPasswordlessLink(email: string) {
     try {
       const { auth } = await getFirebaseClient();
       if (!auth) throw new Error("Authentication service not available.");
@@ -42,7 +43,7 @@ export const authService = {
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", email);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
@@ -53,7 +54,7 @@ export const authService = {
       if (!auth || !googleProvider) throw new Error("Google Sign-In not available.");
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
@@ -64,12 +65,12 @@ export const authService = {
       if (!auth) throw new Error("Authentication service not available.");
       await signOut(auth);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
 
-  async signUpWithEmail(email, password) {
+  async signUpWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
       if (!auth) throw new Error("Authentication service not available.");
@@ -80,21 +81,21 @@ export const authService = {
       };
       await sendEmailVerification(userCredential.user, actionCodeSettings);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
 
-  async updateUserProfile(user, profileData) {
+  async updateUserProfile(user: User, profileData: UserProfile) {
     try {
       await updateProfile(user, profileData);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
 
-  async verifyEmail(user, newEmail) {
+  async verifyEmail(user: User, newEmail: string) {
     try {
       const actionCodeSettings = {
         url: `${window.location.origin}/profile`,
@@ -102,12 +103,12 @@ export const authService = {
       };
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
 
-  async sendPasswordReset(email) {
+  async sendPasswordReset(email: string) {
     try {
       const { auth } = await getFirebaseClient();
       if (!auth) throw new Error("Authentication service not available.");
@@ -117,7 +118,7 @@ export const authService = {
       };
       await sendPasswordResetEmail(auth, email, actionCodeSettings);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.code || "auth/unknown-error" };
     }
   },
