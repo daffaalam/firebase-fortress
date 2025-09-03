@@ -72,7 +72,11 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
         setStatus("valid");
       } catch (error: unknown) {
         let message = t("resetPassword.error.genericVerification");
-        if (error instanceof Error && "code" in error && (error as { code: string }).code === "auth/invalid-action-code") {
+        if (
+          error instanceof Error &&
+          "code" in error &&
+          (error as { code: string }).code === "auth/invalid-action-code"
+        ) {
           message = t("resetPassword.error.verificationFailed.description");
         }
         setErrorMessage(message);
@@ -188,7 +192,11 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
         });
       } catch (error: unknown) {
         let message = isEmailChange ? t("verifyEmailChange.error.failed") : t("verifyEmail.error.failed");
-        if (error instanceof Error && "code" in error && (error as { code: string }).code === "auth/invalid-action-code") {
+        if (
+          error instanceof Error &&
+          "code" in error &&
+          (error as { code: string }).code === "auth/invalid-action-code"
+        ) {
           message = isEmailChange ? t("verifyEmailChange.error.invalidCode") : t("verifyEmail.error.invalidCode");
         }
         setErrorMessage(message);
@@ -272,7 +280,7 @@ function SignIn() {
               description: t("login.success.description"),
             });
             router.push("/dashboard");
-          } catch (error: unknown) {
+          } catch {
             toast({
               variant: "destructive",
               title: t("login.error.title"),

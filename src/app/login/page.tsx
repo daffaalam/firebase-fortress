@@ -6,7 +6,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, signInWithPopup, signOut, sendSignInLinkToEmail } from "firebase/auth";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -183,7 +183,7 @@ export default function LoginPage() {
   return (
     <AuthLayout title={title} description={description}>
       {signInMethod === "emailLink" ? (
-        <Form {...passwordlessForm}>
+        <Form {...passwordlessForm} key="emailLink">
           <form onSubmit={passwordlessForm.handleSubmit(onPasswordlessSubmit)} className="space-y-4">
             <FormField
               control={passwordlessForm.control}
@@ -205,7 +205,7 @@ export default function LoginPage() {
           </form>
         </Form>
       ) : (
-        <Form {...form}>
+        <Form {...form} key="emailPassword">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}

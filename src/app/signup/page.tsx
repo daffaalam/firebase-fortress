@@ -6,7 +6,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
