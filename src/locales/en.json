@@ -26,6 +26,8 @@
   "login.success.linkSent.description": "A sign-in link has been sent to {{email}}. Check your inbox.",
   "login.error.invalidLink": "The sign-in link is invalid or has expired.",
   "login.verifyingLink": "Verifying sign-in link...",
+  "login.error.invalidCredential": "The email or password you entered is incorrect.",
+  "login.error.userDisabled": "This account has been disabled.",
 
   "signup.title": "Create an Account",
   "signup.description": "Enter your email and password to get started",

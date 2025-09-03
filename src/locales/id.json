@@ -26,6 +26,8 @@
   "login.success.linkSent.description": "Tautan masuk telah dikirim ke {{email}}. Periksa kotak masuk Anda.",
   "login.error.invalidLink": "Tautan masuk tidak valid atau telah kedaluwarsa.",
   "login.verifyingLink": "Memverifikasi tautan masuk...",
+  "login.error.invalidCredential": "Email atau kata sandi yang Anda masukkan salah.",
+  "login.error.userDisabled": "Akun ini telah dinonaktifkan.",
 
   "signup.title": "Buat Akun",
   "signup.description": "Masukkan email dan kata sandi Anda untuk memulai",
