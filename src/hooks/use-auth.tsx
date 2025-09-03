@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
     getFirebaseClient().then(({ auth }) => {
+      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (isMounted) {
           setUser(user);
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.replace("/login");
       }
 
-      if (isAuthRoute && user) {
+      if (isAuthRoute && user?.emailVerified) {
         router.replace("/dashboard");
       }
     }
