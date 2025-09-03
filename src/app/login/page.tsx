@@ -6,7 +6,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, signInWithPopup, signOut, sendSignInLinkToEmail } from "firebase/auth";
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -22,7 +22,7 @@ import { AuthLayout } from "@/components/layout/auth-layout";
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
@@ -57,7 +57,6 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
-    reValidateMode: "onChange",
   });
 
   const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
@@ -65,13 +64,7 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
     },
-    reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    form.trigger();
-    passwordlessForm.trigger();
-  }, [language, form, passwordlessForm]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);

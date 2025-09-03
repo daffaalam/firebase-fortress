@@ -6,7 +6,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -20,7 +20,7 @@ import { AuthLayout } from "@/components/layout/auth-layout";
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = useMemo(
@@ -42,12 +42,7 @@ export default function SignupPage() {
       email: "",
       password: "",
     },
-    reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    form.trigger();
-  }, [language, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);

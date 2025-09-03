@@ -27,7 +27,7 @@ import { ActionLayout } from "@/components/layout/auth-layout";
 function ResetPassword({ actionCode }: { actionCode: string }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"verifying" | "valid" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,12 +70,7 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { password: "", confirmPassword: "" },
-    reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    form.trigger();
-  }, [language, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -329,7 +324,7 @@ function ActionHandler() {
 
   const renderContent = () => {
     if (!mode || !actionCode) {
-      if (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href)) {
+      if (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href, getFirebaseClient().auth)) {
         return <SignIn />;
       }
       return <p className="text-destructive text-center">{t("resetPassword.error.invalidLink")}</p>;

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -18,7 +18,7 @@ import { AuthLayout } from "@/components/layout/auth-layout";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = useMemo(
@@ -36,12 +36,7 @@ export default function ForgotPasswordPage() {
     defaultValues: {
       email: "",
     },
-    reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    form.trigger();
-  }, [language, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
