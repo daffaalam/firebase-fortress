@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,7 +46,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth!, values.email, values.password);
       toast({
         title: "Success",
         description: "You have successfully signed in.",
@@ -66,10 +67,7 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
       const { auth, googleProvider } = await getFirebaseClient();
-      console.debug(auth);
-      console.debug(googleProvider);
-      console.debug(auth?.config.authDomain);
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth!, googleProvider!);
       toast({
         title: "Success",
         description: "You have successfully signed in with Google.",
@@ -118,7 +116,15 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+                      >
+                        Forgot Password?
+                      </Link>
+                    </div>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
