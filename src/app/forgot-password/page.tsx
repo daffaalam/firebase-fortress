@@ -5,33 +5,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState, useMemo, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getFirebaseClient } from "@/lib/firebase";
-import { Logo } from "@/components/icons";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { LanguageSwitcher } from "@/components/ui/select";
-
+import { AuthLayout } from "@/components/layout/auth-layout";
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formSchema = useMemo(() => z.object({
-    email: z.string().email({
-      message: t("validation.email.required"),
-    }),
-  }), [t]);
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email({
+          message: t("validation.email.required"),
+        }),
+      }),
+    [t],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,7 +43,6 @@ export default function ForgotPasswordPage() {
   useEffect(() => {
     form.trigger();
   }, [language, form]);
-
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -72,48 +70,35 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-      <LanguageSwitcher />
-      <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex items-center gap-2">
-            <Logo className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">{t("appName")}</h1>
-          </div>
-          <CardTitle className="text-3xl font-bold">{t("forgotPassword.title")}</CardTitle>
-          <CardDescription>{t("forgotPassword.description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("login.emailLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("login.emailPlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {t("forgotPassword.sendResetLink")}
-              </Button>
-            </form>
-          </Form>
+    <AuthLayout title={t("forgotPassword.title")} description={t("forgotPassword.description")}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("login.emailLabel")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("login.emailPlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t("forgotPassword.sendResetLink")}
+          </Button>
+        </form>
+      </Form>
 
-          <div className="mt-6 text-center text-sm">
-            {t("forgotPassword.rememberPassword")}{" "}
-            <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-              {t("login.signIn")}
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <div className="mt-6 text-center text-sm">
+        {t("forgotPassword.rememberPassword")}{" "}
+        <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
+          {t("login.signIn")}
+        </Link>
+      </div>
+    </AuthLayout>
   );
 }

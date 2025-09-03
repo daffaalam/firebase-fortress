@@ -3,32 +3,20 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState, useMemo } from "react";
-import {
-  applyActionCode,
-  confirmPasswordReset,
-  isSignInWithEmailLink,
-  sendSignInLinkToEmail,
-  signInWithEmailLink,
-  verifyPasswordResetCode,
-  sendPasswordResetEmail,
-  verifyBeforeUpdateEmail,
-  updateProfile,
-} from "firebase/auth";
+import { applyActionCode, confirmPasswordReset, isSignInWithEmailLink, signInWithEmailLink, verifyPasswordResetCode } from "firebase/auth";
 import Link from "next/link";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getFirebaseClient } from "@/lib/firebase";
-import { Logo } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/use-language";
-import { LanguageSwitcher } from "@/components/ui/select";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ActionLayout } from "@/components/layout/auth-layout";
 
 // --- ResetPassword Component ---
 function ResetPassword({ actionCode }: { actionCode: string }) {
@@ -316,7 +304,7 @@ function ActionHandler() {
   const renderContent = () => {
     if (!mode || !actionCode) {
         // This could be an email link sign-in, which doesn't have an actionCode in the same way.
-        if (mode === 'signIn' || isSignInWithEmailLink(window.location.href)) {
+        if (mode === 'signIn' || (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href))) {
             return <SignIn />;
         }
       return (
@@ -337,22 +325,9 @@ function ActionHandler() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-      <LanguageSwitcher />
-      <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex items-center gap-2">
-            <Logo className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">{t("appName")}</h1>
-          </div>
-          <CardTitle className="text-3xl font-bold">{getTitle()}</CardTitle>
-          <CardDescription>{getDescription()}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center space-y-6">
-            {renderContent()}
-        </CardContent>
-      </Card>
-    </div>
+    <ActionLayout title={getTitle()} description={getDescription()}>
+      {renderContent()}
+    </ActionLayout>
   );
 }
 
