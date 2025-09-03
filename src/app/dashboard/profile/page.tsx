@@ -131,22 +131,26 @@ export default function ProfilePage() {
                 id="displayName"
                 label="Nama Tampilan"
                 defaultValue={user.displayName || ""}
+                placeholder="contoh: John Doe"
               />
               <FloatingLabelInput
                 id="photoURL"
                 label="URL Avatar"
                 defaultValue={user.photoURL || ""}
+                placeholder="contoh: https://example.com/avatar.png"
               />
               <FloatingLabelInput
                 id="email"
                 type="email"
                 label="Email"
                 defaultValue={user.email || ""}
+                placeholder="contoh: john.doe@example.com"
               />
               <FloatingLabelInput
                 id="phoneNumber"
                 label="Nomor Telepon"
                 defaultValue={user.phoneNumber || ""}
+                placeholder="contoh: +6281234567890"
               />
             </div>
 
