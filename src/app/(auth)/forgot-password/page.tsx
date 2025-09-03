@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Harap masukkan alamat email yang valid.",
   }),
 });
 
@@ -42,14 +42,14 @@ export default function ForgotPasswordPage() {
       const { auth } = await getFirebaseClient();
       await sendPasswordResetEmail(auth!, values.email);
       toast({
-        title: "Password Reset Email Sent",
-        description: `If an account exists for ${values.email}, a password reset link has been sent.`,
+        title: "Email Pengaturan Ulang Kata Sandi Terkirim",
+        description: `Jika akun untuk ${values.email} ada, tautan pengaturan ulang kata sandi telah dikirim.`,
       });
       router.push("/login");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Terjadi kesalahan.",
         description: error.message,
       });
     } finally {
@@ -65,8 +65,8 @@ export default function ForgotPasswordPage() {
             <Logo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Forgot Your Password?</CardTitle>
-          <CardDescription>No worries! Enter your email and we'll send you a reset link.</CardDescription>
+          <CardTitle className="text-3xl font-bold">Lupa Kata Sandi?</CardTitle>
+          <CardDescription>Jangan khawatir! Masukkan email Anda dan kami akan mengirimkan tautan reset.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
+                      <Input placeholder="nama@contoh.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,15 +86,15 @@ export default function ForgotPasswordPage() {
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Reset Link
+                Kirim Tautan Reset
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm">
-            Remembered your password?{" "}
+            Ingat kata sandi Anda?{" "}
             <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Sign in
+              Masuk
             </Link>
           </div>
         </CardContent>

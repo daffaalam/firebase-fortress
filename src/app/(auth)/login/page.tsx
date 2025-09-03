@@ -28,16 +28,16 @@ import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Harap masukkan alamat email yang valid.",
   }),
   password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
+    message: "Kata sandi harus minimal 6 karakter.",
   }),
 });
 
 const passwordlessFormSchema = z.object({
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Harap masukkan alamat email yang valid.",
   }),
 });
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
       if (isSignInWithEmailLink(auth, window.location.href)) {
         let email = window.localStorage.getItem("emailForSignIn");
         if (!email) {
-          email = window.prompt("Please provide your email for confirmation");
+          email = window.prompt("Harap berikan email Anda untuk konfirmasi");
         }
 
         if (email) {
@@ -70,15 +70,15 @@ export default function LoginPage() {
             await signInWithEmailLink(auth, email, window.location.href);
             window.localStorage.removeItem("emailForSignIn");
             toast({
-              title: "Success",
-              description: "You have successfully signed in.",
+              title: "Berhasil",
+              description: "Anda telah berhasil masuk.",
             });
             router.push("/dashboard");
           } catch (error: any) {
             toast({
               variant: "destructive",
-              title: "Sign-in Failed",
-              description: "The sign-in link is invalid or has expired.",
+              title: "Gagal Masuk",
+              description: "Tautan masuk tidak valid atau telah kedaluwarsa.",
             });
           }
         }
@@ -122,14 +122,14 @@ export default function LoginPage() {
       }
 
       toast({
-        title: "Success",
-        description: "You have successfully signed in.",
+        title: "Berhasil",
+        description: "Anda telah berhasil masuk.",
       });
       router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Terjadi kesalahan.",
         description: error.message,
       });
     } finally {
@@ -148,13 +148,13 @@ export default function LoginPage() {
       await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", values.email);
       toast({
-        title: "Sign-in Link Sent",
-        description: `A sign-in link has been sent to ${values.email}. Check your inbox.`,
+        title: "Tautan Masuk Terkirim",
+        description: `Tautan masuk telah dikirim ke ${values.email}. Periksa kotak masuk Anda.`,
       });
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Terjadi kesalahan.",
         description: error.message,
       });
     } finally {
@@ -168,14 +168,14 @@ export default function LoginPage() {
       const { auth, googleProvider } = await getFirebaseClient();
       await signInWithPopup(auth!, googleProvider!);
       toast({
-        title: "Success",
-        description: "You have successfully signed in with Google.",
+        title: "Berhasil",
+        description: "Anda telah berhasil masuk dengan Google.",
       });
       router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Terjadi kesalahan.",
         description: error.message,
       });
     } finally {
@@ -187,7 +187,7 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-muted-foreground">Verifying sign-in link...</p>
+        <p className="ml-4 text-muted-foreground">Memverifikasi tautan masuk...</p>
       </div>
     );
   }
@@ -200,11 +200,11 @@ export default function LoginPage() {
             <Logo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+          <CardTitle className="text-3xl font-bold">Selamat Datang Kembali</CardTitle>
           <CardDescription>
             {signInMethod === "emailLink"
-              ? "Enter your email to receive a sign-in link."
-              : "Enter your credentials to access your account."}
+              ? "Masukkan email Anda untuk menerima tautan masuk."
+              : "Masukkan kredensial Anda untuk mengakses akun."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -218,7 +218,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder="nama@contoh.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -230,7 +230,7 @@ export default function LoginPage() {
                   disabled={isPasswordlessLoading || isGoogleLoading || isLoading}
                 >
                   {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Send Sign-in Link
+                  Kirim Tautan Masuk
                 </Button>
               </form>
             </Form>
@@ -244,7 +244,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder="nama@contoh.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -256,12 +256,12 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Kata Sandi</FormLabel>
                         <Link
                           href="/forgot-password"
                           className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
                         >
-                          Forgot Password?
+                          Lupa Kata Sandi?
                         </Link>
                       </div>
                       <FormControl>
@@ -273,7 +273,7 @@ export default function LoginPage() {
                 />
                 <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign In
+                  Masuk
                 </Button>
               </form>
             </Form>
@@ -281,14 +281,14 @@ export default function LoginPage() {
 
           <div className="mt-4 text-center text-sm">
             <Button variant="link" className="p-0" onClick={() => setSignInMethod(signInMethod === 'password' ? 'emailLink' : 'password')}>
-              {signInMethod === 'password' ? 'Sign in with Email Link' : 'Sign in with Password'}
+              {signInMethod === 'password' ? 'Masuk dengan Tautan Email' : 'Masuk dengan Kata Sandi'}
             </Button>
           </div>
 
           <div className="relative my-6">
             <Separator />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              OR
+              ATAU
             </div>
           </div>
 
@@ -309,9 +309,9 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center text-sm">
-            Don&apos;t have an account?{" "}
+            Belum punya akun?{" "}
             <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Sign up
+              Daftar
             </Link>
           </div>
         </CardContent>

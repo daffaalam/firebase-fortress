@@ -20,10 +20,10 @@ import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Harap masukkan alamat email yang valid.",
   }),
   password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
+    message: "Kata sandi harus minimal 6 karakter.",
   }),
 });
 
@@ -54,7 +54,7 @@ export default function SignupPage() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Terjadi kesalahan.",
         description: error.message,
       });
     } finally {
@@ -70,8 +70,8 @@ export default function SignupPage() {
             <Logo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
-          <CardDescription>Enter your email and password to get started</CardDescription>
+          <CardTitle className="text-3xl font-bold">Buat Akun</CardTitle>
+          <CardDescription>Masukkan email dan kata sandi Anda untuk memulai</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -83,7 +83,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
+                      <Input placeholder="nama@contoh.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -94,7 +94,7 @@ export default function SignupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Kata Sandi</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -104,15 +104,15 @@ export default function SignupPage() {
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
+                Buat Akun
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm">
-            Already have an account?{" "}
+            Sudah punya akun?{" "}
             <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Sign in
+              Masuk
             </Link>
           </div>
         </CardContent>
