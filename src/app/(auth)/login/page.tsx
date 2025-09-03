@@ -48,6 +48,7 @@ export default function LoginPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
   const [isHandlingLink, setIsHandlingLink] = useState(true);
+  const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
   // Handle the email link sign-in on component mount
   useEffect(() => {
@@ -141,7 +142,7 @@ export default function LoginPage() {
     try {
       const { auth } = await getFirebaseClient();
       const actionCodeSettings = {
-        url: window.location.href, // Redirect back to the same page
+        url: window.location.origin + "/login",
         handleCodeInApp: true,
       };
       await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
@@ -200,85 +201,89 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
           </div>
           <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardDescription>
+            {signInMethod === "emailLink"
+              ? "Enter your email to receive a sign-in link."
+              : "Enter your credentials to access your account."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
-                      >
-                        Forgot Password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading || isPasswordlessLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
-              </Button>
-            </form>
-          </Form>
+          {signInMethod === "emailLink" ? (
+            <Form {...passwordlessForm}>
+              <form onSubmit={passwordlessForm.handleSubmit(onPasswordlessSubmit)} className="space-y-4">
+                <FormField
+                  control={passwordlessForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="name@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPasswordlessLoading || isGoogleLoading || isLoading}
+                >
+                  {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Send Sign-in Link
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="name@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Password</FormLabel>
+                        <Link
+                          href="/forgot-password"
+                          className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Sign In
+                </Button>
+              </form>
+            </Form>
+          )}
 
-          <div className="relative my-6">
-            <Separator />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              OR
-            </div>
+          <div className="mt-4 text-center text-sm">
+            <Button variant="link" className="p-0" onClick={() => setSignInMethod(signInMethod === 'password' ? 'emailLink' : 'password')}>
+              {signInMethod === 'password' ? 'Sign in with Email Link' : 'Sign in with Password'}
+            </Button>
           </div>
-
-          <Form {...passwordlessForm}>
-            <form onSubmit={passwordlessForm.handleSubmit(onPasswordlessSubmit)} className="space-y-4">
-              <FormField
-                control={passwordlessForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sign in with Email Link</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                variant="secondary"
-                className="w-full"
-                disabled={isLoading || isPasswordlessLoading || isGoogleLoading}
-              >
-                {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Sign-in Link
-              </Button>
-            </form>
-          </Form>
 
           <div className="relative my-6">
             <Separator />
@@ -288,7 +293,12 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading}>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading || isLoading || isPasswordlessLoading}
+            >
               {isGoogleLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
