@@ -53,7 +53,11 @@ export default function SignupPage() {
     try {
       const { auth } = await getFirebaseClient();
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      await sendEmailVerification(userCredential.user);
+      const actionCodeSettings = {
+        url: window.location.origin + "/actions",
+        handleCodeInApp: true,
+      };
+      await sendEmailVerification(userCredential.user, actionCodeSettings);
       toast({
         title: t("signup.success.title"),
         description: t("signup.success.description"),

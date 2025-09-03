@@ -10,9 +10,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  isSignInWithEmailLink,
   sendSignInLinkToEmail,
-  signInWithEmailLink,
 } from "firebase/auth";
 import { useEffect, useState, useMemo } from "react";
 
@@ -35,7 +33,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
-  const [isHandlingLink, setIsHandlingLink] = useState(true);
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
   const formSchema = useMemo(() => z.object({
@@ -52,45 +49,6 @@ export default function LoginPage() {
       message: t("validation.email.required"),
     }),
   }), [t]);
-
-  // Handle the email link sign-in on component mount
-  useEffect(() => {
-    const handleEmailLinkSignIn = async () => {
-      const { auth } = await getFirebaseClient();
-      if (!auth) {
-        setIsHandlingLink(false);
-        return;
-      }
-
-      if (isSignInWithEmailLink(auth, window.location.href)) {
-        let email = window.localStorage.getItem("emailForSignIn");
-        if (!email) {
-          email = window.prompt(t("login.emailPlaceholder"));
-        }
-
-        if (email) {
-          try {
-            await signInWithEmailLink(auth, email, window.location.href);
-            window.localStorage.removeItem("emailForSignIn");
-            toast({
-              title: t("login.success.title"),
-              description: t("login.success.description"),
-            });
-            router.push("/dashboard");
-          } catch (error: any) {
-            toast({
-              variant: "destructive",
-              title: t("login.error.title"),
-              description: t("login.error.invalidLink"),
-            });
-          }
-        }
-      }
-      setIsHandlingLink(false);
-    };
-
-    handleEmailLinkSignIn();
-  }, [router, toast, t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -153,7 +111,7 @@ export default function LoginPage() {
     try {
       const { auth } = await getFirebaseClient();
       const actionCodeSettings = {
-        url: window.location.origin + "/login",
+        url: window.location.origin + "/actions",
         handleCodeInApp: true,
       };
       await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
@@ -192,15 +150,6 @@ export default function LoginPage() {
     } finally {
       setIsGoogleLoading(false);
     }
-  }
-
-  if (isHandlingLink) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-muted-foreground">{t("login.verifyingLink")}</p>
-      </div>
-    );
   }
 
   return (

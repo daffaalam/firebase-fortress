@@ -50,12 +50,16 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      await sendPasswordResetEmail(auth!, values.email);
+      const actionCodeSettings = {
+        url: window.location.origin + "/actions",
+        handleCodeInApp: true,
+      };
+      await sendPasswordResetEmail(auth!, values.email, actionCodeSettings);
       toast({
         title: t("forgotPassword.success.title"),
         description: t("forgotPassword.success.description", { email: values.email }),
       });
-      router.push("/login");
+      // Don't redirect, just show success message
     } catch (error: any) {
       toast({
         variant: "destructive",

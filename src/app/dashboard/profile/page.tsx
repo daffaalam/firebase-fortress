@@ -78,9 +78,14 @@ export default function ProfilePage() {
 
     setIsUpdating(true);
     try {
+      const actionCodeSettings = {
+        url: window.location.origin + "/actions",
+        handleCodeInApp: true,
+      };
+
       // Perbarui email jika berubah
       if (email !== user.email) {
-        await verifyBeforeUpdateEmail(user, email);
+        await verifyBeforeUpdateEmail(user, email, actionCodeSettings);
         toast({
           title: "Email Verifikasi Terkirim",
           description: `Tautan verifikasi telah dikirim ke ${email}. Harap verifikasi untuk menyelesaikan perubahan.`,
@@ -128,8 +133,13 @@ export default function ProfilePage() {
       if (!auth) {
         throw new Error("Koneksi ke layanan otentikasi gagal. Muat ulang halaman dan coba lagi.");
       }
+      
+      const actionCodeSettings = {
+        url: window.location.origin + "/actions",
+        handleCodeInApp: true,
+      };
 
-      await sendPasswordResetEmail(auth, user.email);
+      await sendPasswordResetEmail(auth, user.email, actionCodeSettings);
       toast({
         title: "Email Terkirim",
         description: "Email pengaturan ulang kata sandi telah dikirim ke " + user.email,
