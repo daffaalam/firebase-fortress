@@ -79,7 +79,7 @@ export default function ProfilePage() {
     setIsUpdating(true);
     try {
       const actionCodeSettings = {
-        url: window.location.origin + "/actions",
+        url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
 
@@ -135,7 +135,7 @@ export default function ProfilePage() {
       }
       
       const actionCodeSettings = {
-        url: window.location.origin + "/actions",
+        url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
 

@@ -111,7 +111,7 @@ export default function LoginPage() {
     try {
       const { auth } = await getFirebaseClient();
       const actionCodeSettings = {
-        url: window.location.origin + "/actions",
+        url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
       await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);

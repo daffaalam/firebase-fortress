@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
     try {
       const { auth } = await getFirebaseClient();
       const actionCodeSettings = {
-        url: window.location.origin + "/actions",
+        url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
       };
       await sendPasswordResetEmail(auth!, values.email, actionCodeSettings);
