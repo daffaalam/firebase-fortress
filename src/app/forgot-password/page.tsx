@@ -27,26 +27,14 @@ export default function ForgotPasswordPage() {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formSchema = useMemo(() => {
-    return forgotPasswordSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-    });
-  }, [t]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof forgotPasswordSchema>>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
@@ -62,10 +50,14 @@ export default function ForgotPasswordPage() {
       });
       // Don't redirect, just show success message
     } catch (error: unknown) {
+      let description = "An unexpected error occurred.";
+      if (error instanceof Error) {
+        description = error.message;
+      }
       toast({
         variant: "destructive",
-        title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: t("forgotPassword.error.title"),
+        description,
       });
     } finally {
       setIsLoading(false);

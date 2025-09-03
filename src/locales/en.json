@@ -46,6 +46,7 @@
   "forgotPassword.rememberPassword": "Remember your password?",
   "forgotPassword.success.title": "Password Reset Email Sent",
   "forgotPassword.success.description": "If an account for {{email}} exists, a password reset link has been sent.",
+  "forgotPassword.error.title": "Failed to Send Link",
 
   "resetPassword.title": "Reset Your Password",
   "resetPassword.description.form": "Enter your new password below.",

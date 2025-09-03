@@ -46,6 +46,7 @@
   "forgotPassword.rememberPassword": "Ingat kata sandi Anda?",
   "forgotPassword.success.title": "Email Pengaturan Ulang Kata Sandi Terkirim",
   "forgotPassword.success.description": "Jika akun untuk {{email}} ada, tautan pengaturan ulang kata sandi telah dikirim.",
+  "forgotPassword.error.title": "Gagal Mengirim Tautan",
 
   "resetPassword.title": "Atur Ulang Kata Sandi Anda",
   "resetPassword.description.form": "Masukkan kata sandi baru Anda di bawah ini.",
