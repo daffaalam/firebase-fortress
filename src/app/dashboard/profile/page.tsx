@@ -42,15 +42,6 @@ function FloatingLabelInput({
   );
 }
 
-function ProfileDataItem({ label, value }: { label: string; value: string | undefined | null }) {
-  return (
-    <div>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <p className="text-base text-foreground">{value || "N/A"}</p>
-    </div>
-  );
-}
-
 export default function ProfilePage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -130,7 +121,7 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-6 rounded-lg border p-4">
               <h3 className="mb-6 text-lg font-medium">Informasi Profil</h3>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={avatarUrl} alt={user.displayName ?? "Pengguna"} />
                   <AvatarFallback className="text-3xl">{getInitials(user.email)}</AvatarFallback>
@@ -182,25 +173,32 @@ export default function ProfilePage() {
 
             <div className="space-y-6 rounded-lg border p-4">
               <h3 className="mb-4 text-lg font-medium">Detail Akun (Hanya Baca)</h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <ProfileDataItem label="ID Pengguna (UID)" value={user.uid} />
-                <ProfileDataItem
-                  label="Waktu Pembuatan"
-                  value={user.metadata.creationTime ? format(new Date(user.metadata.creationTime), "PPP p") : "N/A"}
-                />
-                <ProfileDataItem
-                  label="Terakhir Masuk"
-                  value={user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"}
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Email Terverifikasi</span>
+              <FloatingLabelInput
+                id="uid"
+                label="ID Pengguna (UID)"
+                defaultValue={user.uid}
+                disabled
+              />
+              <FloatingLabelInput
+                id="creationTime"
+                label="Waktu Pembuatan"
+                defaultValue={user.metadata.creationTime ? format(new Date(user.metadata.creationTime), "PPP p") : "N/A"}
+                disabled
+              />
+              <FloatingLabelInput
+                id="lastSignInTime"
+                label="Terakhir Masuk"
+                defaultValue={user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"}
+                disabled
+              />
+               <div className="flex items-center justify-between rounded-md border border-input px-3 py-2">
+                  <Label htmlFor="emailVerified" className="text-sm text-muted-foreground">Email Terverifikasi</Label>
                   <Switch id="emailVerified" checked={user.emailVerified} disabled />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Akun Anonim</span>
+                <div className="flex items-center justify-between rounded-md border border-input px-3 py-2">
+                  <Label htmlFor="isAnonymous" className="text-sm text-muted-foreground">Akun Anonim</Label>
                   <Switch id="isAnonymous" checked={user.isAnonymous} disabled />
                 </div>
-              </div>
             </div>
 
             <div className="space-y-4 rounded-lg border p-4">
