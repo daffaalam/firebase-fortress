@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -46,7 +46,19 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      await signInWithEmailAndPassword(auth!, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(auth!, values.email, values.password);
+
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth!);
+        toast({
+          variant: "destructive",
+          title: "Verifikasi Email Diperlukan",
+          description: "Silakan verifikasi email Anda sebelum masuk. Periksa kotak masuk Anda untuk tautan verifikasi.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       toast({
         title: "Success",
         description: "You have successfully signed in.",

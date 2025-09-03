@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -43,12 +44,13 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      await sendEmailVerification(userCredential.user);
       toast({
-        title: "Account Created",
-        description: "Your account has been successfully created.",
+        title: "Akun Dibuat & Email Verifikasi Terkirim",
+        description: "Akun Anda telah dibuat. Silakan periksa email Anda untuk memverifikasi akun Anda sebelum masuk.",
       });
-      router.push("/dashboard");
+      router.push("/login");
     } catch (error: any) {
       toast({
         variant: "destructive",

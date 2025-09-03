@@ -20,23 +20,32 @@ import { Loader2 } from "lucide-react";
 function FloatingLabelInput({
   id: providedId,
   label,
+  placeholder,
   ...props
 }: ComponentProps<typeof Input> & { label: string }) {
   const defaultId = useId();
   const id = providedId || defaultId;
+
   return (
-    <div className="relative pt-2">
+    <div className="relative pt-6">
       <Label
         htmlFor={id}
-        className="absolute left-2 -top-0 text-xs text-muted-foreground bg-card px-1"
+        className="absolute left-2 -top-0 text-xs text-muted-foreground px-1"
       >
         {label}
       </Label>
-      <Input
-        id={id}
-        className="peer block w-full appearance-none rounded-md border-input bg-transparent px-3 py-2 text-base md:text-sm"
-        {...props}
-      />
+      <Input id={id} className="peer block w-full appearance-none rounded-md border-input bg-transparent px-3 py-2 text-base md:text-sm" placeholder={placeholder} {...props} />
+    </div>
+  );
+}
+
+function SwitchControl({ label, ...props }: ComponentProps<typeof Switch> & { label: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-md border border-input px-3 py-2">
+      <Label htmlFor={props.id} className="text-sm text-muted-foreground">
+        {label}
+      </Label>
+      <Switch id={props.id} {...props} />
     </div>
   );
 }
@@ -130,27 +139,27 @@ export default function ProfilePage() {
               <FloatingLabelInput
                 id="displayName"
                 label="Nama Tampilan"
-                defaultValue={user.displayName || ""}
                 placeholder="contoh: John Doe"
+                defaultValue={user.displayName || ""}
               />
               <FloatingLabelInput
                 id="photoURL"
                 label="URL Avatar"
-                defaultValue={user.photoURL || ""}
                 placeholder="contoh: https://example.com/avatar.png"
+                defaultValue={user.photoURL || ""}
               />
               <FloatingLabelInput
                 id="email"
                 type="email"
                 label="Email"
-                defaultValue={user.email || ""}
                 placeholder="contoh: john.doe@example.com"
+                defaultValue={user.email || ""}
               />
               <FloatingLabelInput
                 id="phoneNumber"
                 label="Nomor Telepon"
-                defaultValue={user.phoneNumber || ""}
                 placeholder="contoh: +6281234567890"
+                defaultValue={user.phoneNumber || ""}
               />
             </div>
 
@@ -176,12 +185,7 @@ export default function ProfilePage() {
 
             <div className="space-y-6 rounded-lg border p-4">
               <h3 className="mb-4 text-lg font-medium">Detail Akun (Hanya Baca)</h3>
-              <FloatingLabelInput
-                id="uid"
-                label="ID Pengguna (UID)"
-                defaultValue={user.uid}
-                disabled
-              />
+              <FloatingLabelInput id="uid" label="ID Pengguna (UID)" defaultValue={user.uid} disabled />
               <FloatingLabelInput
                 id="creationTime"
                 label="Waktu Pembuatan"
@@ -191,17 +195,13 @@ export default function ProfilePage() {
               <FloatingLabelInput
                 id="lastSignInTime"
                 label="Terakhir Masuk"
-                defaultValue={user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"}
+                defaultValue={
+                  user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"
+                }
                 disabled
               />
-               <div className="flex items-center justify-between rounded-md border border-input px-3 py-2">
-                  <Label htmlFor="emailVerified" className="text-sm text-muted-foreground">Email Terverifikasi</Label>
-                  <Switch id="emailVerified" checked={user.emailVerified} disabled />
-                </div>
-                <div className="flex items-center justify-between rounded-md border border-input px-3 py-2">
-                  <Label htmlFor="isAnonymous" className="text-sm text-muted-foreground">Akun Anonim</Label>
-                  <Switch id="isAnonymous" checked={user.isAnonymous} disabled />
-                </div>
+              <SwitchControl id="emailVerified" label="Email Terverifikasi" checked={user.emailVerified} disabled />
+              <SwitchControl id="isAnonymous" label="Akun Anonim" checked={user.isAnonymous} disabled />
             </div>
 
             <div className="space-y-4 rounded-lg border p-4">
