@@ -96,11 +96,11 @@ export default function LoginPage() {
         description: t("login.success.description"),
       });
       router.push("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsLoading(false);
@@ -113,7 +113,7 @@ export default function LoginPage() {
       const { auth } = await getFirebaseClient();
       if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
       const actionCodeSettings = {
-        url: window.location.origin + "/auth/action",
+        url: window.location.origin + "/auth/action?mode=signIn",
         handleCodeInApp: true,
       };
       await sendSignInLinkToEmail(auth, values.email, actionCodeSettings);
@@ -122,11 +122,11 @@ export default function LoginPage() {
         title: t("login.success.linkSent.title"),
         description: t("login.success.linkSent.description", { email: values.email }),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsPasswordlessLoading(false);
@@ -144,11 +144,11 @@ export default function LoginPage() {
         description: t("login.success.google"),
       });
       router.push("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsGoogleLoading(false);

@@ -19,9 +19,10 @@ export async function createUser(formData: FormData) {
       password: validatedData.password,
     });
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating user:", error);
-    return { success: false, error: error.message || "Gagal membuat pengguna." };
+    const errorMessage = error instanceof Error ? error.message : "Gagal membuat pengguna.";
+    return { success: false, error: errorMessage };
   }
 }
 

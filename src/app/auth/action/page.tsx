@@ -55,9 +55,9 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
         if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
         await verifyPasswordResetCode(auth, actionCode);
         setStatus("valid");
-      } catch (error: any) {
+      } catch (error: unknown) {
         let message = t("resetPassword.error.genericVerification");
-        if (error.code === "auth/invalid-action-code") {
+        if (error instanceof Error && "code" in error && (error as { code: string }).code === "auth/invalid-action-code") {
           message = t("resetPassword.error.verificationFailed.description");
         }
         setErrorMessage(message);
@@ -88,11 +88,11 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
         description: t("resetPassword.success.description"),
       });
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsLoading(false);
@@ -176,9 +176,9 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
             ? t("verifyEmailChange.successToast.description")
             : t("verifyEmail.successToast.description"),
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         let message = isEmailChange ? t("verifyEmailChange.error.failed") : t("verifyEmail.error.failed");
-        if (error.code === "auth/invalid-action-code") {
+        if (error instanceof Error && "code" in error && (error as { code: string }).code === "auth/invalid-action-code") {
           message = isEmailChange ? t("verifyEmailChange.error.invalidCode") : t("verifyEmail.error.invalidCode");
         }
         setErrorMessage(message);
@@ -262,7 +262,7 @@ function SignIn() {
               description: t("login.success.description"),
             });
             router.push("/dashboard");
-          } catch (error: any) {
+          } catch (error: unknown) {
             toast({
               variant: "destructive",
               title: t("login.error.title"),
@@ -329,8 +329,7 @@ function ActionHandler() {
 
   const renderContent = () => {
     if (!mode || !actionCode) {
-      // This could be an email link sign-in, which doesn't have an actionCode in the same way.
-      if (mode === "signIn" || (typeof window !== "undefined" && isSignInWithEmailLink(window.location.href))) {
+      if (typeof window !== 'undefined' && isSignInWithEmailLink(window.location.href)) {
         return <SignIn />;
       }
       return <p className="text-destructive text-center">{t("resetPassword.error.invalidLink")}</p>;
@@ -344,6 +343,9 @@ function ActionHandler() {
       case "verifyAndChangeEmail":
         return <VerifyEmail actionCode={actionCode} mode={mode} />;
       default:
+        if (mode === "signIn") {
+          return <SignIn />;
+        }
         return <p className="text-destructive text-center">Tindakan tidak didukung.</p>;
     }
   };

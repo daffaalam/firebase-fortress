@@ -104,11 +104,11 @@ export default function ProfilePage() {
         title: "Profil Diperbarui",
         description: "Informasi profil Anda telah berhasil disimpan.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: "Gagal Memperbarui Profil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsUpdating(false);
@@ -143,11 +143,11 @@ export default function ProfilePage() {
         title: "Email Terkirim",
         description: "Email pengaturan ulang kata sandi telah dikirim ke " + user.email,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: "Gagal mengirim email",
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsPasswordResetLoading(false);

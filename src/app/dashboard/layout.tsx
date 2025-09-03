@@ -49,11 +49,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         description: "You have been successfully signed out.",
       });
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: "Sign Out Error",
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     }
   };

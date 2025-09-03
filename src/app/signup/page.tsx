@@ -65,11 +65,11 @@ export default function SignupPage() {
         description: t("signup.success.description"),
       });
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsLoading(false);

@@ -58,11 +58,11 @@ export default function ForgotPasswordPage() {
         description: t("forgotPassword.success.description", { email: values.email }),
       });
       // Don't redirect, just show success message
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setIsLoading(false);
