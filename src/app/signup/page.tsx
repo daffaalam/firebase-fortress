@@ -17,24 +17,39 @@ import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { AuthLayout } from "@/components/layout/auth-layout";
 
+const signupFormSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+});
+
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formSchema = useMemo(
-    () =>
-      z.object({
-        email: z.string().email({
+  const formSchema = useMemo(() => {
+    return signupFormSchema.superRefine((val, ctx) => {
+      if (!val.email.includes("@")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.email.required"),
-        }),
-        password: z.string().min(6, {
+          path: ["email"],
+        });
+      }
+      if (val.password.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.password.required"),
-        }),
-      }),
-    [t],
-  );
+          path: ["password"],
+        });
+      }
+    });
+  }, [t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

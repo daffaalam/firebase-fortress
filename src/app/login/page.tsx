@@ -19,6 +19,15 @@ import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { AuthLayout } from "@/components/layout/auth-layout";
 
+const passwordFormSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+});
+
+const passwordlessFormSchemaDef = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }),
+});
+
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -28,28 +37,36 @@ export default function LoginPage() {
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
-  const formSchema = useMemo(
-    () =>
-      z.object({
-        email: z.string().email({
+  const formSchema = useMemo(() => {
+    return passwordFormSchema.superRefine((val, ctx) => {
+      if (!val.email.includes("@")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.email.required"),
-        }),
-        password: z.string().min(6, {
+          path: ["email"],
+        });
+      }
+      if (val.password.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.password.required"),
-        }),
-      }),
-    [t],
-  );
+          path: ["password"],
+        });
+      }
+    });
+  }, [t]);
 
-  const passwordlessFormSchema = useMemo(
-    () =>
-      z.object({
-        email: z.string().email({
+  const passwordlessFormSchema = useMemo(() => {
+    return passwordlessFormSchemaDef.superRefine((val, ctx) => {
+      if (!val.email.includes("@")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.email.required"),
-        }),
-      }),
-    [t],
-  );
+          path: ["email"],
+        });
+      }
+    });
+  }, [t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

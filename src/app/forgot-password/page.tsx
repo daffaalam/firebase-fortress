@@ -16,20 +16,28 @@ import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { AuthLayout } from "@/components/layout/auth-layout";
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+});
+
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formSchema = useMemo(
-    () =>
-      z.object({
-        email: z.string().email({
+  const formSchema = useMemo(() => {
+    return forgotPasswordSchema.superRefine((val, ctx) => {
+      if (!val.email.includes("@")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.email.required"),
-        }),
-      }),
-    [t],
-  );
+          path: ["email"],
+        });
+      }
+    });
+  }, [t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

@@ -23,6 +23,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { ActionLayout } from "@/components/layout/auth-layout";
 
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(6, {
+      message: "Password must be at least 6 characters.",
+    }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
 // --- ResetPassword Component ---
 function ResetPassword({ actionCode }: { actionCode: string }) {
   const router = useRouter();
@@ -32,21 +44,24 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
   const [status, setStatus] = useState<"verifying" | "valid" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const formSchema = useMemo(
-    () =>
-      z
-        .object({
-          password: z.string().min(6, {
-            message: t("validation.password.required"),
-          }),
-          confirmPassword: z.string(),
-        })
-        .refine((data) => data.password === data.confirmPassword, {
+  const formSchema = useMemo(() => {
+    return resetPasswordSchema.superRefine((val, ctx) => {
+      if (val.password.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("validation.password.required"),
+          path: ["password"],
+        });
+      }
+      if (val.password !== val.confirmPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: t("validation.password.mismatch"),
           path: ["confirmPassword"],
-        }),
-    [t],
-  );
+        });
+      }
+    });
+  }, [t]);
 
   useEffect(() => {
     const handleVerifyCode = async () => {
