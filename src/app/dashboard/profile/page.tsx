@@ -25,19 +25,18 @@ function FloatingLabelInput({
   const defaultId = useId();
   const id = providedId || defaultId;
   return (
-    <div className="relative">
-      <Input
-        id={id}
-        placeholder=" "
-        className="peer block w-full appearance-none rounded-md border-input bg-transparent px-3 py-2 text-base md:text-sm"
-        {...props}
-      />
+    <div className="relative pt-2">
       <Label
         htmlFor={id}
-        className="absolute left-3 top-2 z-10 origin-[0] -translate-y-5 scale-90 transform bg-background px-1 text-sm text-muted-foreground duration-300 peer-placeholder-shown:left-3 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:left-3 peer-focus:top-2 peer-focus:-translate-y-5 peer-focus:scale-90 peer-focus:px-1 peer-focus:text-primary"
+        className="absolute left-2 -top-0 text-xs text-muted-foreground bg-card px-1"
       >
         {label}
       </Label>
+      <Input
+        id={id}
+        className="peer block w-full appearance-none rounded-md border-input bg-transparent px-3 py-2 text-base md:text-sm"
+        {...props}
+      />
     </div>
   );
 }
