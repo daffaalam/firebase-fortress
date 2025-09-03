@@ -66,6 +66,9 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
       const { auth, googleProvider } = await getFirebaseClient();
+      console.debug(auth);
+      console.debug(googleProvider);
+      console.debug(auth?.config.authDomain);
       await signInWithPopup(auth, googleProvider);
       toast({
         title: "Success",
