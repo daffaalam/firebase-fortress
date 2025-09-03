@@ -4,7 +4,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getGravatarUrl } from "@/lib/utils";
-import { useState, ComponentProps, useId } from "react";
+import { useState, ComponentProps, useId, useEffect } from "react";
 import { getFirebaseClient } from "@/lib/firebase";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { Loader2 } from "lucide-react";
+import { sendPasswordResetEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 
 function FloatingLabelInput({
   id: providedId,
@@ -28,13 +27,10 @@ function FloatingLabelInput({
 
   return (
     <div className="relative pt-6">
-      <Label
-        htmlFor={id}
-        className="absolute left-2 -top-0 text-xs text-muted-foreground px-1"
-      >
+      <Label htmlFor={id} className="absolute left-2 -top-0 text-xs text-muted-foreground px-1">
         {label}
       </Label>
-      <Input id={id} className="peer block w-full appearance-none rounded-md border-input bg-transparent px-3 py-2 text-base md:text-sm" placeholder={placeholder} {...props} />
+      <Input id={id} placeholder={placeholder} {...props} />
     </div>
   );
 }
@@ -53,19 +49,66 @@ function SwitchControl({ label, ...props }: ComponentProps<typeof Switch> & { la
 export default function ProfilePage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isPasswordResetLoading, setIsPasswordResetLoading] = useState(false);
+
+  // State untuk setiap field yang dapat diedit
+  const [displayName, setDisplayName] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || "");
+      setPhotoURL(user.photoURL || "");
+      setEmail(user.email || "");
+      setPhoneNumber(user.phoneNumber || "");
+    }
+  }, [user]);
 
   const getInitials = (email: string | null | undefined) => {
     if (!email) return "U";
     return email.substring(0, 2).toUpperCase();
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    toast({
-      title: "Fungsi Belum Diimplementasikan",
-      description: "Kemampuan untuk memperbarui profil belum diimplementasikan dalam demo ini.",
-    });
+    if (!user) return;
+
+    setIsUpdating(true);
+    try {
+      // Perbarui email jika berubah
+      if (email !== user.email) {
+        await verifyBeforeUpdateEmail(user, email);
+        toast({
+          title: "Email Verifikasi Terkirim",
+          description: `Tautan verifikasi telah dikirim ke ${email}. Harap verifikasi untuk menyelesaikan perubahan.`,
+        });
+      }
+
+      // Perbarui profil lainnya
+      await updateProfile(user, {
+        displayName: displayName,
+        photoURL: photoURL,
+      });
+
+      // Anda mungkin perlu fungsi backend untuk memperbarui nomor telepon
+      // updatePhoneNumber(user, phoneNumber)
+
+      toast({
+        title: "Profil Diperbarui",
+        description: "Informasi profil Anda telah berhasil disimpan.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Gagal Memperbarui Profil",
+        description: error.message,
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handlePasswordReset = async () => {
@@ -105,7 +148,9 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <main className="flex-1 p-4 sm:p-6">
-        <p>Memuat profil...</p>
+        <div className="flex justify-center items-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </main>
     );
   }
@@ -140,26 +185,30 @@ export default function ProfilePage() {
                 id="displayName"
                 label="Nama Tampilan"
                 placeholder="contoh: John Doe"
-                defaultValue={user.displayName || ""}
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
               />
               <FloatingLabelInput
                 id="photoURL"
                 label="URL Avatar"
                 placeholder="contoh: https://example.com/avatar.png"
-                defaultValue={user.photoURL || ""}
+                value={photoURL}
+                onChange={(e) => setPhotoURL(e.target.value)}
               />
               <FloatingLabelInput
                 id="email"
                 type="email"
                 label="Email"
                 placeholder="contoh: john.doe@example.com"
-                defaultValue={user.email || ""}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <FloatingLabelInput
                 id="phoneNumber"
                 label="Nomor Telepon"
                 placeholder="contoh: +6281234567890"
-                defaultValue={user.phoneNumber || ""}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
 
@@ -223,7 +272,10 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit">Perbarui Profil</Button>
+              <Button type="submit" disabled={isUpdating}>
+                {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Simpan Perubahan
+              </Button>
             </div>
           </form>
         </CardContent>
