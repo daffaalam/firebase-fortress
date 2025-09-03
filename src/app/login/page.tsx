@@ -5,19 +5,18 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, signInWithPopup, signOut, sendSignInLinkToEmail } from "firebase/auth";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getFirebaseClient } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon } from "@/components/icons";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { AuthLayout } from "@/components/layout/auth-layout";
+import { AuthLayout } from "@/features/auth/components/auth-layout";
+import { authService } from "@/features/auth/services/auth.service";
 
 const passwordFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -52,129 +51,76 @@ export default function LoginPage() {
     },
   });
 
+  const handleError = (error: string) => {
+    let description = "An unexpected error occurred.";
+    switch (error) {
+      case "auth/invalid-credential":
+        description = t("login.error.invalidCredential");
+        break;
+      case "auth/user-disabled":
+        description = t("login.error.userDisabled");
+        break;
+      case "auth/email-not-verified":
+        description = t("login.error.emailVerification");
+        break;
+      case "auth/popup-closed-by-user":
+        description = t("login.error.popupClosed");
+        break;
+      case "auth/account-exists-with-different-credential":
+        description = t("login.error.accountExistsWithDifferentCredential");
+        break;
+      default:
+        description = error;
+    }
+    toast({
+      variant: "destructive",
+      title: t("login.error.title"),
+      description,
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof passwordFormSchema>) {
     setIsLoading(true);
-    try {
-      const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-
-      if (!userCredential.user.emailVerified) {
-        await signOut(auth);
-        toast({
-          variant: "destructive",
-          title: t("login.error.emailVerification.title"),
-          description: t("login.error.emailVerification"),
-        });
-        setIsLoading(false);
-        return;
-      }
-
+    const result = await authService.signInWithEmail(values.email, values.password);
+    if (result.success) {
       toast({
         title: t("login.success.title"),
         description: t("login.success.description"),
       });
       router.push("/dashboard");
-    } catch (error: unknown) {
-      let description = "An unexpected error occurred.";
-      if (error && typeof error === "object" && "code" in error) {
-        switch (error.code) {
-          case "auth/invalid-credential":
-            description = t("login.error.invalidCredential");
-            break;
-          case "auth/user-disabled":
-            description = t("login.error.userDisabled");
-            break;
-          default:
-            description = error instanceof Error ? error.message : description;
-        }
-      } else if (error instanceof Error) {
-        description = error.message;
-      }
-
-      toast({
-        variant: "destructive",
-        title: t("login.error.title"),
-        description,
-      });
-    } finally {
-      setIsLoading(false);
+    } else {
+      handleError(result.error);
     }
+    setIsLoading(false);
   }
 
   async function onPasswordlessSubmit(values: z.infer<typeof passwordlessFormSchema>) {
     setIsPasswordlessLoading(true);
-    try {
-      const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
-      const actionCodeSettings = {
-        url: window.location.origin + "/auth/action?mode=signIn",
-        handleCodeInApp: true,
-      };
-      await sendSignInLinkToEmail(auth, values.email, actionCodeSettings);
-      window.localStorage.setItem("emailForSignIn", values.email);
+    const result = await authService.sendPasswordlessLink(values.email);
+    if (result.success) {
       toast({
         title: t("login.success.linkSent.title"),
         description: t("login.success.linkSent.description", { email: values.email }),
       });
-    } catch (error: unknown) {
-      let description = "An unexpected error occurred.";
-      if (error && typeof error === "object" && "code" in error) {
-        // Handle specific codes here in the future if needed
-        switch (error.code) {
-          default:
-            description = error instanceof Error ? error.message : description;
-        }
-      } else if (error instanceof Error) {
-        description = error.message;
-      }
-
-      toast({
-        variant: "destructive",
-        title: t("login.error.title"),
-        description,
-      });
-    } finally {
-      setIsPasswordlessLoading(false);
+    } else {
+      handleError(result.error);
     }
+    setIsPasswordlessLoading(false);
   }
 
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
-    try {
-      const { auth, googleProvider } = await getFirebaseClient();
-      if (!auth || !googleProvider) throw new Error("Koneksi ke layanan otentikasi Google gagal.");
-      await signInWithPopup(auth, googleProvider);
+    const result = await authService.signInWithGoogle();
+    if (result.success) {
       toast({
         title: t("login.success.title"),
         description: t("login.success.google"),
       });
       router.push("/dashboard");
-    } catch (error: unknown) {
-      let description = "An unexpected error occurred.";
-      if (error && typeof error === "object" && "code" in error) {
-        switch (error.code) {
-          case "auth/popup-closed-by-user":
-            description = t("login.error.popupClosed");
-            break;
-          case "auth/account-exists-with-different-credential":
-            description = t("login.error.accountExistsWithDifferentCredential");
-            break;
-          default:
-            description = error instanceof Error ? error.message : description;
-        }
-      } else if (error instanceof Error) {
-        description = error.message;
-      }
-
-      toast({
-        variant: "destructive",
-        title: t("login.error.title"),
-        description,
-      });
-    } finally {
-      setIsGoogleLoading(false);
+    } else {
+      handleError(result.error);
     }
+    setIsGoogleLoading(false);
   }
 
   const title = t("login.title");

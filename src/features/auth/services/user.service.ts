@@ -1,8 +1,8 @@
 "use server";
 
 import { auth as adminAuth } from "firebase-admin";
-import { initializeAdminApp } from "../firebase-admin";
-import type { UserRecord } from "@/types";
+import { initializeAdminApp } from "@/lib/firebase-admin";
+import type { UserRecord } from "../models/user.model";
 import { z } from "zod";
 
 const CreateUserSchema = z.object({

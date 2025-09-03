@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,15 +22,14 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { signOut } from "firebase/auth";
-import { getFirebaseClient } from "@/lib/firebase";
+import { authService } from "@/features/auth/services/auth.service";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/icons";
 import { ChevronDown, LayoutDashboard, LogOut, Users, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { getGravatarUrl } from "@/lib/utils";
+import { getGravatarUrl, getInitials } from "@/lib/utils";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -39,28 +38,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { toast } = useToast();
 
   const handleSignOut = async () => {
-    try {
-      const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
-      await signOut(auth);
+    const result = await authService.signOutUser();
+    if (result.success) {
       window.localStorage.removeItem("emailForSignIn");
       toast({
         title: "Signed Out",
         description: "You have been successfully signed out.",
       });
       router.push("/login");
-    } catch (error: unknown) {
+    } else {
       toast({
         variant: "destructive",
         title: "Sign Out Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description: result.error,
       });
     }
-  };
-
-  const getInitials = (email: string | null | undefined) => {
-    if (!email) return "U";
-    return email.substring(0, 2).toUpperCase();
   };
 
   const getPageTitle = () => {
@@ -69,6 +61,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (pathname.startsWith("/dashboard/profile")) return "Profile";
     return "Dashboard";
   };
+
+  const menuItems = [
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      isActive: pathname === "/dashboard",
+    },
+    {
+      href: "/dashboard/users",
+      label: "Users",
+      icon: Users,
+      isActive: pathname.startsWith("/dashboard/users"),
+    },
+  ];
 
   const avatarUrl = user?.photoURL || getGravatarUrl(user?.email);
 
@@ -83,22 +90,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
-                <Link href="/dashboard">
-                  <LayoutDashboard />
-                  Dashboard
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard/users")}>
-                <Link href="/dashboard/users">
-                  <Users />
-                  Users
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton asChild isActive={item.isActive}>
+                  <Link href={item.href}>
+                    <item.icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
@@ -113,7 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Button variant="ghost" className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={avatarUrl} alt={user?.displayName ?? "User"} />
-                  <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(user?.displayName, user?.email)}</AvatarFallback>
                 </Avatar>
                 <span className="hidden sm:inline">{user?.email}</span>
                 <ChevronDown className="h-4 w-4" />

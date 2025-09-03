@@ -1,8 +1,8 @@
 "use server";
 
 import { isToday } from "date-fns";
-import type { DashboardStats } from "@/types";
-import { listUsers } from "./user.actions";
+import type { DashboardStats } from "../models/dashboard.model";
+import { listUsers } from "../../auth/services/user.service";
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   try {
