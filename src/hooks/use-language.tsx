@@ -1,32 +1,32 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
-import id from "@/locales/id.json";
 import en from "@/locales/en.json";
+import id from "@/locales/id.json";
 
-type Language = "id" | "en";
+type Language = "en" | "id";
 
-const translations = { id, en };
+const translations = { en, id };
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: keyof typeof id, replacements?: Record<string, string>) => string;
+  t: (key: keyof typeof en, replacements?: Record<string, string>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("id");
+  const [language, setLanguageState] = useState<Language>("en");
 
   useEffect(() => {
     // Set language from localStorage or browser settings on initial load
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage && ["id", "en"].includes(savedLanguage)) {
+    if (savedLanguage && ["en", "id"].includes(savedLanguage)) {
       setLanguageState(savedLanguage);
     } else {
       const browserLang = navigator.language.split("-")[0];
-      setLanguageState(browserLang === "id" ? "id" : "en");
+      setLanguageState(browserLang === "en" ? "en" : "id");
     }
   }, []);
 
