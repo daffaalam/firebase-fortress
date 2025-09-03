@@ -7,7 +7,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -17,33 +17,37 @@ import { useToast } from "@/hooks/use-toast";
 import { getFirebaseClient } from "@/lib/firebase";
 import { Logo } from "@/components/icons";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageSwitcher } from "@/components/ui/select";
 
-const formSchema = z
-  .object({
-    password: z.string().min(6, {
-      message: "Kata sandi harus minimal 6 karakter.",
-    }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Kata sandi tidak cocok.",
-    path: ["confirmPassword"],
-  });
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"verifying" | "valid" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
   const [actionCode, setActionCode] = useState<string | null>(null);
 
+  const formSchema = useMemo(() => z
+    .object({
+      password: z.string().min(6, {
+        message: t("validation.password.required"),
+      }),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("validation.password.mismatch"),
+      path: ["confirmPassword"],
+    }), [t]);
+
   useEffect(() => {
     const code = searchParams.get("oobCode");
 
     if (!code) {
-      setErrorMessage("Tautan pengaturan ulang kata sandi tidak valid atau hilang.");
+      setErrorMessage(t("resetPassword.error.invalidLink"));
       setStatus("error");
       return;
     }
@@ -56,22 +60,22 @@ function ResetPasswordContent() {
         await verifyPasswordResetCode(auth!, code);
         setStatus("valid");
       } catch (error: any) {
-        let message = "Gagal memverifikasi tautan pengaturan ulang.";
+        let message = t("resetPassword.error.genericVerification");
         if (error.code === "auth/invalid-action-code") {
-          message = "Tautan pengaturan ulang tidak valid atau telah kedaluwarsa. Silakan minta yang baru.";
+          message = t("resetPassword.error.verificationFailed.description");
         }
         setErrorMessage(message);
         setStatus("error");
         toast({
           variant: "destructive",
-          title: "Verifikasi Gagal",
+          title: t("resetPassword.error.verificationFailed.title"),
           description: message,
         });
       }
     };
 
     handleVerifyCode();
-  }, [searchParams, toast]);
+  }, [searchParams, toast, t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,7 +83,12 @@ function ResetPasswordContent() {
       password: "",
       confirmPassword: "",
     },
+    reValidateMode: "onChange",
   });
+
+  useEffect(() => {
+    form.trigger();
+  }, [language, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!actionCode) return;
@@ -89,14 +98,14 @@ function ResetPasswordContent() {
       const { auth } = await getFirebaseClient();
       await confirmPasswordReset(auth!, actionCode, values.password);
       toast({
-        title: "Kata Sandi Berhasil Direset",
-        description: "Anda sekarang dapat masuk dengan kata sandi baru Anda.",
+        title: t("resetPassword.success.title"),
+        description: t("resetPassword.success.description"),
       });
       router.push("/login");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: t("login.error.title"),
         description: error.message,
       });
     } finally {
@@ -110,7 +119,7 @@ function ResetPasswordContent() {
         return (
           <>
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
-            <p className="text-muted-foreground">Memverifikasi tautan...</p>
+            <p className="text-muted-foreground">{t("resetPassword.verifying")}</p>
           </>
         );
       case "error":
@@ -119,7 +128,7 @@ function ResetPasswordContent() {
             <XCircle className="h-16 w-16 text-destructive" />
             <p className="text-center text-destructive">{errorMessage}</p>
             <Button asChild className="w-full" variant="outline">
-              <Link href="/login">Kembali ke Halaman Masuk</Link>
+              <Link href="/login">{t("resetPassword.backToLogin")}</Link>
             </Button>
           </>
         );
@@ -133,7 +142,7 @@ function ResetPasswordContent() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kata Sandi Baru</FormLabel>
+                      <FormLabel>{t("resetPassword.newPasswordLabel")}</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
@@ -146,7 +155,7 @@ function ResetPasswordContent() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Konfirmasi Kata Sandi Baru</FormLabel>
+                      <FormLabel>{t("resetPassword.confirmPasswordLabel")}</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
@@ -156,7 +165,7 @@ function ResetPasswordContent() {
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Atur Ulang Kata Sandi
+                  {t("resetPassword.resetPasswordButton")}
                 </Button>
               </form>
             </Form>
@@ -167,17 +176,18 @@ function ResetPasswordContent() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <LanguageSwitcher />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex items-center gap-2">
             <Logo className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("appName")}</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Atur Ulang Kata Sandi Anda</CardTitle>
+          <CardTitle className="text-3xl font-bold">{t("resetPassword.title")}</CardTitle>
           <CardDescription>
-            {status === "valid" && "Masukkan kata sandi baru Anda di bawah ini."}
-            {status === "verifying" && "Harap tunggu sementara kami memvalidasi permintaan Anda."}
-            {status === "error" && "Terjadi kesalahan."}
+            {status === "valid" && t("resetPassword.description.form")}
+            {status === "verifying" && t("resetPassword.description.verifying")}
+            {status === "error" && t("resetPassword.description.error")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-6">{renderContent()}</CardContent>

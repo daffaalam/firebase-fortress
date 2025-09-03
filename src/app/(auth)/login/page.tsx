@@ -14,7 +14,7 @@ import {
   sendSignInLinkToEmail,
   signInWithEmailLink,
 } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -25,30 +25,33 @@ import { getFirebaseClient } from "@/lib/firebase";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon, Logo } from "@/components/icons";
 import { Loader2 } from "lucide-react";
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Harap masukkan alamat email yang valid.",
-  }),
-  password: z.string().min(6, {
-    message: "Kata sandi harus minimal 6 karakter.",
-  }),
-});
-
-const passwordlessFormSchema = z.object({
-  email: z.string().email({
-    message: "Harap masukkan alamat email yang valid.",
-  }),
-});
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageSwitcher } from "@/components/ui/select";
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
   const [isHandlingLink, setIsHandlingLink] = useState(true);
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
+
+  const formSchema = useMemo(() => z.object({
+    email: z.string().email({
+      message: t("validation.email.required"),
+    }),
+    password: z.string().min(6, {
+      message: t("validation.password.required"),
+    }),
+  }), [t]);
+  
+  const passwordlessFormSchema = useMemo(() => z.object({
+    email: z.string().email({
+      message: t("validation.email.required"),
+    }),
+  }), [t]);
 
   // Handle the email link sign-in on component mount
   useEffect(() => {
@@ -62,7 +65,7 @@ export default function LoginPage() {
       if (isSignInWithEmailLink(auth, window.location.href)) {
         let email = window.localStorage.getItem("emailForSignIn");
         if (!email) {
-          email = window.prompt("Harap berikan email Anda untuk konfirmasi");
+          email = window.prompt(t("login.emailPlaceholder"));
         }
 
         if (email) {
@@ -70,15 +73,15 @@ export default function LoginPage() {
             await signInWithEmailLink(auth, email, window.location.href);
             window.localStorage.removeItem("emailForSignIn");
             toast({
-              title: "Berhasil",
-              description: "Anda telah berhasil masuk.",
+              title: t("login.success.title"),
+              description: t("login.success.description"),
             });
             router.push("/dashboard");
           } catch (error: any) {
             toast({
               variant: "destructive",
-              title: "Gagal Masuk",
-              description: "Tautan masuk tidak valid atau telah kedaluwarsa.",
+              title: t("login.error.title"),
+              description: t("login.error.invalidLink"),
             });
           }
         }
@@ -87,7 +90,7 @@ export default function LoginPage() {
     };
 
     handleEmailLinkSignIn();
-  }, [router, toast]);
+  }, [router, toast, t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,6 +98,7 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
+    reValidateMode: "onChange",
   });
 
   const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
@@ -102,7 +106,14 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
     },
+    reValidateMode: "onChange",
   });
+
+  useEffect(() => {
+    form.trigger();
+    passwordlessForm.trigger();
+  }, [language, form, passwordlessForm]);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -114,22 +125,22 @@ export default function LoginPage() {
         await signOut(auth!);
         toast({
           variant: "destructive",
-          title: "Verifikasi Email Diperlukan",
-          description: "Silakan verifikasi email Anda sebelum masuk. Periksa kotak masuk Anda untuk tautan verifikasi.",
+          title: t("login.error.emailVerification.title"),
+          description: t("login.error.emailVerification"),
         });
         setIsLoading(false);
         return;
       }
 
       toast({
-        title: "Berhasil",
-        description: "Anda telah berhasil masuk.",
+        title: t("login.success.title"),
+        description: t("login.success.description"),
       });
       router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Terjadi kesalahan.",
+        title: t("login.error.title"),
         description: error.message,
       });
     } finally {
@@ -148,13 +159,13 @@ export default function LoginPage() {
       await sendSignInLinkToEmail(auth!, values.email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", values.email);
       toast({
-        title: "Tautan Masuk Terkirim",
-        description: `Tautan masuk telah dikirim ke ${values.email}. Periksa kotak masuk Anda.`,
+        title: t("login.success.linkSent.title"),
+        description: t("login.success.linkSent.description", { email: values.email }),
       });
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Terjadi kesalahan.",
+        title: t("login.error.title"),
         description: error.message,
       });
     } finally {
@@ -168,14 +179,14 @@ export default function LoginPage() {
       const { auth, googleProvider } = await getFirebaseClient();
       await signInWithPopup(auth!, googleProvider!);
       toast({
-        title: "Berhasil",
-        description: "Anda telah berhasil masuk dengan Google.",
+        title: t("login.success.title"),
+        description: t("login.success.google"),
       });
       router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Terjadi kesalahan.",
+        title: t("login.error.title"),
         description: error.message,
       });
     } finally {
@@ -187,24 +198,25 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-muted-foreground">Memverifikasi tautan masuk...</p>
+        <p className="ml-4 text-muted-foreground">{t("login.verifyingLink")}</p>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <LanguageSwitcher />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex items-center gap-2">
             <Logo className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("appName")}</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Selamat Datang Kembali</CardTitle>
+          <CardTitle className="text-3xl font-bold">{t("login.title")}</CardTitle>
           <CardDescription>
             {signInMethod === "emailLink"
-              ? "Masukkan email Anda untuk menerima tautan masuk."
-              : "Masukkan kredensial Anda untuk mengakses akun."}
+              ? t("login.description.emailLink")
+              : t("login.description.password")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -216,9 +228,9 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("login.emailLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="nama@contoh.com" {...field} />
+                        <Input placeholder={t("login.emailPlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -230,7 +242,7 @@ export default function LoginPage() {
                   disabled={isPasswordlessLoading || isGoogleLoading || isLoading}
                 >
                   {isPasswordlessLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Kirim Tautan Masuk
+                  {t("login.sendSignInLink")}
                 </Button>
               </form>
             </Form>
@@ -242,9 +254,9 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("login.emailLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="nama@contoh.com" {...field} />
+                        <Input placeholder={t("login.emailPlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -256,16 +268,16 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Kata Sandi</FormLabel>
+                        <FormLabel>{t("login.passwordLabel")}</FormLabel>
                         <Link
                           href="/forgot-password"
                           className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
                         >
-                          Lupa Kata Sandi?
+                          {t("login.forgotPassword")}
                         </Link>
                       </div>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder={t("login.passwordPlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -273,7 +285,7 @@ export default function LoginPage() {
                 />
                 <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Masuk
+                  {t("login.signIn")}
                 </Button>
               </form>
             </Form>
@@ -281,14 +293,14 @@ export default function LoginPage() {
 
           <div className="mt-4 text-center text-sm">
             <Button variant="link" className="p-0" onClick={() => setSignInMethod(signInMethod === 'password' ? 'emailLink' : 'password')}>
-              {signInMethod === 'password' ? 'Masuk dengan Tautan Email' : 'Masuk dengan Kata Sandi'}
+              {signInMethod === 'password' ? t("login.switch.toEmailLink") : t("login.switch.toPassword")}
             </Button>
           </div>
 
           <div className="relative my-6">
             <Separator />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              ATAU
+              {t("login.orSeparator")}
             </div>
           </div>
 
@@ -309,9 +321,9 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center text-sm">
-            Belum punya akun?{" "}
+            {t("login.noAccount")}{" "}
             <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Daftar
+              {t("login.signUp")}
             </Link>
           </div>
         </CardContent>

@@ -7,6 +7,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { useState, useMemo, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,22 +16,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { getFirebaseClient } from "@/lib/firebase";
 import { Logo } from "@/components/icons";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Harap masukkan alamat email yang valid.",
-  }),
-  password: z.string().min(6, {
-    message: "Kata sandi harus minimal 6 karakter.",
-  }),
-});
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageSwitcher } from "@/components/ui/select";
 
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = useMemo(() => z.object({
+    email: z.string().email({
+      message: t("validation.email.required"),
+    }),
+    password: z.string().min(6, {
+      message: t("validation.password.required"),
+    }),
+  }), [t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,7 +41,12 @@ export default function SignupPage() {
       email: "",
       password: "",
     },
+    reValidateMode: "onChange",
   });
+
+  useEffect(() => {
+    form.trigger();
+  }, [language, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -47,14 +55,14 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       await sendEmailVerification(userCredential.user);
       toast({
-        title: "Akun Dibuat & Email Verifikasi Terkirim",
-        description: "Akun Anda telah dibuat. Silakan periksa email Anda untuk memverifikasi akun Anda sebelum masuk.",
+        title: t("signup.success.title"),
+        description: t("signup.success.description"),
       });
       router.push("/login");
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Terjadi kesalahan.",
+        title: t("login.error.title"),
         description: error.message,
       });
     } finally {
@@ -64,14 +72,15 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <LanguageSwitcher />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex items-center gap-2">
             <Logo className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">Firebase Fortress</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("appName")}</h1>
           </div>
-          <CardTitle className="text-3xl font-bold">Buat Akun</CardTitle>
-          <CardDescription>Masukkan email dan kata sandi Anda untuk memulai</CardDescription>
+          <CardTitle className="text-3xl font-bold">{t("signup.title")}</CardTitle>
+          <CardDescription>{t("signup.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -81,9 +90,9 @@ export default function SignupPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("login.emailLabel")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="nama@contoh.com" {...field} />
+                      <Input placeholder={t("login.emailPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -94,9 +103,9 @@ export default function SignupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kata Sandi</FormLabel>
+                    <FormLabel>{t("login.passwordLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder={t("login.passwordPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,15 +113,15 @@ export default function SignupPage() {
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Buat Akun
+                {t("signup.createAccount")}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm">
-            Sudah punya akun?{" "}
+            {t("signup.hasAccount")}{" "}
             <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Masuk
+              {t("login.signIn")}
             </Link>
           </div>
         </CardContent>

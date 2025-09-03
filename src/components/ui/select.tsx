@@ -131,6 +131,28 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+// Custom component for language switcher
+const LanguageSwitcher = () => {
+  const { language, setLanguage, t } = useLanguage();
+
+  return (
+    <div className="absolute top-4 right-4">
+      <Select onValueChange={(value: "id" | "en") => setLanguage(value)} defaultValue={language}>
+        <SelectTrigger className="w-[120px]">
+          <SelectValue placeholder={t('language')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="id">Indonesia</SelectItem>
+          <SelectItem value="en">English</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
+// Re-export useLanguage to be used in LanguageSwitcher
+import { useLanguage } from "@/hooks/use-language";
+
 export {
   Select,
   SelectGroup,
@@ -142,4 +164,5 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
+  LanguageSwitcher
 };
