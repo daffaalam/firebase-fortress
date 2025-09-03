@@ -34,7 +34,7 @@ function FloatingLabelInput({
       />
       <Label
         htmlFor={id}
-        className="absolute left-1 top-2 z-10 origin-[0] -translate-y-4 scale-90 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-1 peer-focus:-translate-y-4 peer-focus:scale-90 peer-focus:px-2 peer-focus:text-primary"
+        className="absolute left-1 top-2 z-10 origin-[0] -translate-y-5 scale-90 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-1 peer-focus:-translate-y-5 peer-focus:scale-90 peer-focus:px-2 peer-focus:text-primary"
       >
         {label}
       </Label>
