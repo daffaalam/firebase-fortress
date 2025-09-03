@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/toaster";
 
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jakarta",
+});
+
 export const metadata: Metadata = {
   title: "Firebase Fortress",
   description: "A robust Firebase user management application.",
+  appleWebApp: {
+    title: "Firebase Fortress",
+  },
 };
 
 export default function RootLayout({
@@ -15,16 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        <meta name="apple-mobile-web-app-title" content="Firebase Fortress" />
-      </head>
-      <body className="font-body antialiased">
+      <body className={`${jakarta.variable} font-body antialiased`}>
         <AuthProvider>
           {children}
           <Toaster />
