@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { listUsers } from "@/lib/actions/user.actions";
-import type { UserRecord } from "@/types";
-import { getGravatarUrl } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
+import { listUsers } from "@/features/auth/services/user.service";
+import type { UserRecord } from "@/features/auth/models/user.model";
+import { getGravatarUrl, getInitials } from "@/lib/utils";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
 export function UserTable() {
@@ -54,15 +54,6 @@ export function UserTable() {
     });
   };
 
-  const getInitials = (displayName: string | undefined) => {
-    if (!displayName) return "U";
-    const names = displayName.split(" ");
-    if (names.length > 1) {
-      return names[0][0] + names[1][0];
-    }
-    return displayName.substring(0, 2).toUpperCase();
-  };
-
   const getRole = (customClaims: { [key: string]: unknown } | undefined) => {
     if (customClaims?.admin) return "Admin";
     if (customClaims?.editor) return "Editor";
@@ -94,7 +85,7 @@ export function UserTable() {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user.photoURL || getGravatarUrl(user.email)} alt={user.displayName} />
-                    <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                    <AvatarFallback>{getInitials(user.displayName, user.email)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium">{user.displayName || "N/A"}</div>

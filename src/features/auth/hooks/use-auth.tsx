@@ -1,10 +1,10 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User, onAuthStateChanged } from "firebase/auth";
-import { getFirebaseClient } from "@/lib/firebase";
+import { User } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { authService } from "../services/auth.service";
 
 interface AuthContextType {
   user: User | null;
@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const protectedRoutes = ["/dashboard"];
-const authRoutes = ["/login", "/signup"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -26,25 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    let isMounted = true;
-    getFirebaseClient().then(({ auth }) => {
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (isMounted) {
-          setUser(user);
-          setLoading(false);
-        }
-      });
-
-      return () => {
-        isMounted = false;
-        unsubscribe();
-      };
+    const unsubscribe = authService.onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
     });
 
-    return () => {
-      isMounted = false;
-    };
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {

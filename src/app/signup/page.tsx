@@ -5,17 +5,16 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getFirebaseClient } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { AuthLayout } from "@/components/layout/auth-layout";
+import { AuthLayout } from "@/features/auth/components/auth-layout";
+import { authService } from "@/features/auth/services/auth.service";
 
 const signupFormSchema = z.object({
   email: z.string().email({
@@ -40,44 +39,35 @@ export default function SignupPage() {
     },
   });
 
+  const handleError = (error: string) => {
+    let description = "An unexpected error occurred.";
+    switch (error) {
+      case "auth/email-already-in-use":
+        description = t("signup.error.emailAlreadyInUse");
+        break;
+      default:
+        description = error;
+    }
+    toast({
+      variant: "destructive",
+      title: t("signup.error.title"),
+      description,
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof signupFormSchema>) {
     setIsLoading(true);
-    try {
-      const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      const actionCodeSettings = {
-        url: window.location.origin + "/auth/action",
-        handleCodeInApp: true,
-      };
-      await sendEmailVerification(userCredential.user, actionCodeSettings);
+    const result = await authService.signUpWithEmail(values.email, values.password);
+    if (result.success) {
       toast({
         title: t("signup.success.title"),
         description: t("signup.success.description"),
       });
       router.push("/login");
-    } catch (error: unknown) {
-      let description = "An unexpected error occurred.";
-      if (error && typeof error === "object" && "code" in error) {
-        switch (error.code) {
-          case "auth/email-already-in-use":
-            description = t("signup.error.emailAlreadyInUse");
-            break;
-          default:
-            description = error instanceof Error ? error.message : description;
-        }
-      } else if (error instanceof Error) {
-        description = error.message;
-      }
-
-      toast({
-        variant: "destructive",
-        title: t("signup.error.title"),
-        description,
-      });
-    } finally {
-      setIsLoading(false);
+    } else {
+      handleError(result.error);
     }
+    setIsLoading(false);
   }
 
   return (

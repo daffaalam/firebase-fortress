@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User as UserIcon, Loader2 } from "lucide-react";
@@ -12,8 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getGravatarUrl } from "@/lib/utils";
 import { useState, ComponentProps, useId, useEffect } from "react";
-import { getFirebaseClient } from "@/lib/firebase";
-import { sendPasswordResetEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { authService } from "@/features/auth/services/auth.service";
 
 function FloatingLabelInput({
   id: providedId,
@@ -77,25 +76,28 @@ export default function ProfilePage() {
 
     setIsUpdating(true);
     try {
-      const actionCodeSettings = {
-        url: window.location.origin + "/auth/action",
-        handleCodeInApp: true,
-      };
-
       // Perbarui email jika berubah
       if (email !== user.email) {
-        await verifyBeforeUpdateEmail(user, email, actionCodeSettings);
-        toast({
-          title: "Email Verifikasi Terkirim",
-          description: `Tautan verifikasi telah dikirim ke ${email}. Harap verifikasi untuk menyelesaikan perubahan.`,
-        });
+        const emailResult = await authService.verifyEmail(user, email);
+        if (emailResult.success) {
+          toast({
+            title: "Email Verifikasi Terkirim",
+            description: `Tautan verifikasi telah dikirim ke ${email}. Harap verifikasi untuk menyelesaikan perubahan.`,
+          });
+        } else {
+          throw new Error(emailResult.error);
+        }
       }
 
       // Perbarui profil lainnya
-      await updateProfile(user, {
+      const profileResult = await authService.updateUserProfile(user, {
         displayName: displayName,
         photoURL: photoURL,
       });
+
+      if (!profileResult.success) {
+        throw new Error(profileResult.error);
+      }
 
       // Anda mungkin perlu fungsi backend untuk memperbarui nomor telepon
       // updatePhoneNumber(user, phoneNumber)
@@ -126,32 +128,20 @@ export default function ProfilePage() {
     }
 
     setIsPasswordResetLoading(true);
-    try {
-      const { auth } = await getFirebaseClient();
-
-      if (!auth) {
-        throw new Error("Koneksi ke layanan otentikasi gagal. Muat ulang halaman dan coba lagi.");
-      }
-
-      const actionCodeSettings = {
-        url: window.location.origin + "/auth/action",
-        handleCodeInApp: true,
-      };
-
-      await sendPasswordResetEmail(auth, user.email, actionCodeSettings);
+    const result = await authService.sendPasswordReset(user.email);
+    if (result.success) {
       toast({
         title: "Email Terkirim",
         description: "Email pengaturan ulang kata sandi telah dikirim ke " + user.email,
       });
-    } catch (error: unknown) {
+    } else {
       toast({
         variant: "destructive",
         title: "Gagal mengirim email",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description: result.error,
       });
-    } finally {
-      setIsPasswordResetLoading(false);
     }
+    setIsPasswordResetLoading(false);
   };
 
   if (!user) {

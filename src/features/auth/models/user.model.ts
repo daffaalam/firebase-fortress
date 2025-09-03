@@ -1,10 +1,5 @@
 import type { UserRecord as FirebaseUserRecord } from "firebase-admin/auth";
 
-export type DashboardStats = {
-  totalUsers: number;
-  activeToday: number;
-};
-
 // We create a serializable UserRecord type because the default one is not.
 export type UserRecord = Omit<FirebaseUserRecord, "toJSON" | "providerData"> & {
   providerData: Omit<FirebaseUserRecord["providerData"][0], "toJSON">[];
