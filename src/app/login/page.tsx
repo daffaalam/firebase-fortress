@@ -24,7 +24,7 @@ const passwordFormSchema = z.object({
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
-const passwordlessFormSchemaDef = z.object({
+const passwordlessFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
 
@@ -37,8 +37,8 @@ export default function LoginPage() {
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
-  const formSchema = useMemo(() => {
-    return passwordFormSchema.superRefine((val, ctx) => {
+  const form = useForm<z.infer<typeof passwordFormSchema>>({
+    resolver: zodResolver(passwordFormSchema.superRefine((val, ctx) => {
       if (!val.email.includes("@")) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -53,23 +53,7 @@ export default function LoginPage() {
           path: ["password"],
         });
       }
-    });
-  }, [t]);
-
-  const passwordlessFormSchema = useMemo(() => {
-    return passwordlessFormSchemaDef.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-    });
-  }, [t]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    })),
     defaultValues: {
       email: "",
       password: "",
@@ -77,13 +61,21 @@ export default function LoginPage() {
   });
 
   const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
-    resolver: zodResolver(passwordlessFormSchema),
+    resolver: zodResolver(passwordlessFormSchema.superRefine((val, ctx) => {
+      if (!val.email.includes("@")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("validation.email.required"),
+          path: ["email"],
+        });
+      }
+    })),
     defaultValues: {
       email: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof passwordFormSchema>) {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
