@@ -38,22 +38,7 @@ export default function LoginPage() {
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
   const form = useForm<z.infer<typeof passwordFormSchema>>({
-    resolver: zodResolver(passwordFormSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-      if (val.password.length < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.password.required"),
-          path: ["password"],
-        });
-      }
-    })),
+    resolver: zodResolver(passwordFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -61,15 +46,7 @@ export default function LoginPage() {
   });
 
   const passwordlessForm = useForm<z.infer<typeof passwordlessFormSchema>>({
-    resolver: zodResolver(passwordlessFormSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-    })),
+    resolver: zodResolver(passwordlessFormSchema),
     defaultValues: {
       email: "",
     },
@@ -99,10 +76,26 @@ export default function LoginPage() {
       });
       router.push("/dashboard");
     } catch (error: unknown) {
+      let description = "An unexpected error occurred.";
+      if (error && typeof error === "object" && "code" in error) {
+        switch (error.code) {
+          case "auth/invalid-credential":
+            description = t("login.error.invalidCredential");
+            break;
+          case "auth/user-disabled":
+            description = t("login.error.userDisabled");
+            break;
+          default:
+            description = error instanceof Error ? error.message : description;
+        }
+      } else if (error instanceof Error) {
+        description = error.message;
+      }
+
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description,
       });
     } finally {
       setIsLoading(false);
@@ -125,10 +118,21 @@ export default function LoginPage() {
         description: t("login.success.linkSent.description", { email: values.email }),
       });
     } catch (error: unknown) {
+      let description = "An unexpected error occurred.";
+      if (error && typeof error === "object" && "code" in error) {
+        // Handle specific codes here in the future if needed
+        switch (error.code) {
+          default:
+            description = error instanceof Error ? error.message : description;
+        }
+      } else if (error instanceof Error) {
+        description = error.message;
+      }
+
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description,
       });
     } finally {
       setIsPasswordlessLoading(false);
@@ -147,10 +151,26 @@ export default function LoginPage() {
       });
       router.push("/dashboard");
     } catch (error: unknown) {
+      let description = "An unexpected error occurred.";
+      if (error && typeof error === "object" && "code" in error) {
+        switch (error.code) {
+          case "auth/popup-closed-by-user":
+            description = t("login.error.popupClosed");
+            break;
+          case "auth/account-exists-with-different-credential":
+            description = t("login.error.accountExistsWithDifferentCredential");
+            break;
+          default:
+            description = error instanceof Error ? error.message : description;
+        }
+      } else if (error instanceof Error) {
+        description = error.message;
+      }
+
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description,
       });
     } finally {
       setIsGoogleLoading(false);

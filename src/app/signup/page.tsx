@@ -32,34 +32,15 @@ export default function SignupPage() {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formSchema = useMemo(() => {
-    return signupFormSchema.superRefine((val, ctx) => {
-      if (!val.email.includes("@")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.email.required"),
-          path: ["email"],
-        });
-      }
-      if (val.password.length < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.password.required"),
-          path: ["password"],
-        });
-      }
-    });
-  }, [t]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signupFormSchema>>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof signupFormSchema>) {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
@@ -76,10 +57,23 @@ export default function SignupPage() {
       });
       router.push("/login");
     } catch (error: unknown) {
+      let description = "An unexpected error occurred.";
+      if (error && typeof error === "object" && "code" in error) {
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            description = t("signup.error.emailAlreadyInUse");
+            break;
+          default:
+            description = error instanceof Error ? error.message : description;
+        }
+      } else if (error instanceof Error) {
+        description = error.message;
+      }
+
       toast({
         variant: "destructive",
-        title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: t("signup.error.title"),
+        description,
       });
     } finally {
       setIsLoading(false);
