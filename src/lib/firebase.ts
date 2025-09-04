@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth, GoogleAuthProvider } from "firebase/auth";
+import en from "@/locales/en.json";
 
 // These variables will hold the singleton instances of the Firebase services.
 // We use simple module-level variables to ensure that the Firebase app is
@@ -50,7 +51,7 @@ export async function getFirebaseClient() {
   const firebaseConfig = await getFirebaseConfig();
 
   if (!firebaseConfig) {
-    console.error("Firebase configuration could not be loaded. Client-side features will be disabled.");
+    console.error(en["error.firebaseConfigMissing"]);
     return { app: null, auth: null, googleProvider: null };
   }
 

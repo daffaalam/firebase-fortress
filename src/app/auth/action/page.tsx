@@ -23,17 +23,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { ActionLayout } from "@/features/auth/components/auth-layout";
 
-const resetPasswordSchema = z
-  .object({
-    password: z.string().min(6, {
-      message: "Password must be at least 6 characters.",
-    }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  });
+const resetPasswordSchema = (t: (key: any) => string) =>
+  z
+    .object({
+      password: z.string().min(6, {
+        message: t("validation.password.required"),
+      }),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("validation.password.mismatch"),
+      path: ["confirmPassword"],
+    });
 
 // --- ResetPassword Component ---
 function ResetPassword({ actionCode }: { actionCode: string }) {
@@ -44,30 +45,13 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
   const [status, setStatus] = useState<"verifying" | "valid" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const formSchema = useMemo(() => {
-    return resetPasswordSchema.superRefine((val, ctx) => {
-      if (val.password.length < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.password.required"),
-          path: ["password"],
-        });
-      }
-      if (val.password !== val.confirmPassword) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("validation.password.mismatch"),
-          path: ["confirmPassword"],
-        });
-      }
-    });
-  }, [t]);
+  const formSchema = useMemo(() => resetPasswordSchema(t), [t]);
 
   useEffect(() => {
     const handleVerifyCode = async () => {
       try {
         const { auth } = await getFirebaseClient();
-        if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+        if (!auth) throw new Error(t("error.authServiceConnectionFailed"));
         await verifyPasswordResetCode(auth, actionCode);
         setStatus("valid");
       } catch (error: unknown) {
@@ -95,7 +79,7 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+      if (!auth) throw new Error(t("error.authServiceConnectionFailed"));
       await confirmPasswordReset(auth, actionCode, values.password);
       toast({
         title: t("resetPassword.success.title"),
@@ -106,7 +90,7 @@ function ResetPassword({ actionCode }: { actionCode: string }) {
       toast({
         variant: "destructive",
         title: t("login.error.title"),
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        description: error instanceof Error ? error.message : t("error.unknown"),
       });
     } finally {
       setIsLoading(false);
@@ -181,7 +165,7 @@ function VerifyEmail({ actionCode, mode }: { actionCode: string; mode: string })
     const handleVerify = async () => {
       try {
         const { auth } = await getFirebaseClient();
-        if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+        if (!auth) throw new Error(t("error.authServiceConnectionFailed"));
         await applyActionCode(auth, actionCode);
         setStatus("success");
         toast({
@@ -259,7 +243,7 @@ function SignIn() {
         toast({
           variant: "destructive",
           title: t("login.error.title"),
-          description: "Koneksi ke layanan otentikasi gagal.",
+          description: t("error.authServiceConnectionFailed"),
         });
         router.push("/login");
         return;
@@ -376,7 +360,7 @@ function ActionHandler() {
       case "verifyAndChangeEmail":
         return <VerifyEmail actionCode={actionCode} mode={mode} />;
       default:
-        return <p className="text-destructive text-center">Tindakan tidak didukung.</p>;
+        return <p className="text-destructive text-center">{t("error.unsupportedAction")}</p>;
     }
   };
 

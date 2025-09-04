@@ -18,9 +18,11 @@ import type { UserRecord } from "@/features/auth/models/user.model";
 import { getGravatarUrl, getInitials } from "@/lib/utils";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/hooks/use-language";
 
 export function UserTable() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
@@ -36,8 +38,8 @@ export function UserTable() {
         console.error("Failed to fetch users:", error);
         toast({
           variant: "destructive",
-          title: "Gagal memuat pengguna",
-          description: "Tidak dapat mengambil daftar pengguna dari server.",
+          title: t("userManagement.error.fetchUsers.title"),
+          description: t("userManagement.error.fetchUsers.description"),
         });
       } finally {
         setLoading(false);
@@ -45,19 +47,22 @@ export function UserTable() {
     };
 
     fetchUsers();
-  }, [toast]);
+  }, [toast, t]);
 
   const handleAction = (action: string, userName: string | undefined) => {
     toast({
-      title: `Tindakan ${action}`,
-      description: `Tindakan ${action} untuk ${userName || "pengguna"} tidak diterapkan dalam demo ini.`,
+      title: t("userManagement.actions.inDemo.title", { action: action }),
+      description: t("userManagement.actions.inDemo.description", {
+        action: action.toLowerCase(),
+        user: userName || t("user"),
+      }),
     });
   };
 
-  const getRole = (customClaims: { [key: string]: unknown } | undefined) => {
-    if (customClaims?.admin) return "Admin";
-    if (customClaims?.editor) return "Editor";
-    return "Viewer";
+  const getRole = (customClaims: { [key: string]: any } | undefined) => {
+    if (customClaims?.admin) return t("userManagement.roles.admin");
+    if (customClaims?.editor) return t("userManagement.roles.editor");
+    return t("userManagement.roles.viewer");
   };
 
   if (loading) {
@@ -73,9 +78,9 @@ export function UserTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Pengguna</TableHead>
-            <TableHead className="hidden sm:table-cell">Peran</TableHead>
-            <TableHead className="text-right">Tindakan</TableHead>
+            <TableHead>{t("userManagement.table.headers.user")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("userManagement.table.headers.role")}</TableHead>
+            <TableHead className="text-right">{t("userManagement.table.headers.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -94,7 +99,7 @@ export function UserTable() {
                 </div>
               </TableCell>
               <TableCell className="hidden sm:table-cell">
-                <Badge variant={getRole(user.customClaims) === "Admin" ? "default" : "secondary"}>
+                <Badge variant={getRole(user.customClaims) === t("userManagement.roles.admin") ? "default" : "secondary"}>
                   {getRole(user.customClaims)}
                 </Badge>
               </TableCell>
@@ -103,7 +108,7 @@ export function UserTable() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">
                       <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Tindakan Pengguna</span>
+                      <span className="sr-only">{t("userManagement.table.userActions")}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -112,20 +117,20 @@ export function UserTable() {
                         if (user.uid === currentUser?.uid) {
                           router.push("/dashboard/profile");
                         } else {
-                          handleAction("Perbarui", user.displayName);
+                          handleAction(t("userManagement.actions.update"), user.displayName);
                         }
                       }}
                     >
                       <Edit className="mr-2 h-4 w-4" />
-                      <span>Perbarui Profil</span>
+                      <span>{t("userManagement.actions.updateProfile")}</span>
                     </DropdownMenuItem>
                     {user.uid !== currentUser?.uid && (
                       <DropdownMenuItem
-                        onClick={() => handleAction("Hapus", user.displayName)}
+                        onClick={() => handleAction(t("userManagement.actions.delete"), user.displayName)}
                         className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        <span>Hapus Pengguna</span>
+                        <span>{t("userManagement.actions.deleteUser")}</span>
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>

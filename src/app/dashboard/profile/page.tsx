@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { getGravatarUrl } from "@/lib/utils";
 import { useState, ComponentProps, useId, useEffect } from "react";
 import { authService } from "@/features/auth/services/auth.service";
+import { useLanguage } from "@/hooks/use-language";
 
 function FloatingLabelInput({
   id: providedId,
@@ -47,6 +48,7 @@ function SwitchControl({ label, ...props }: ComponentProps<typeof Switch> & { la
 export default function ProfilePage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isPasswordResetLoading, setIsPasswordResetLoading] = useState(false);
 
@@ -81,8 +83,8 @@ export default function ProfilePage() {
         const emailResult = await authService.verifyEmail(user, email);
         if (emailResult.success) {
           toast({
-            title: "Email Verifikasi Terkirim",
-            description: `Tautan verifikasi telah dikirim ke ${email}. Harap verifikasi untuk menyelesaikan perubahan.`,
+            title: t("profile.update.emailVerificationSent.title"),
+            description: t("profile.update.emailVerificationSent.description", { email: email }),
           });
         } else {
           throw new Error(emailResult.error);
@@ -103,14 +105,14 @@ export default function ProfilePage() {
       // updatePhoneNumber(user, phoneNumber)
 
       toast({
-        title: "Profil Diperbarui",
-        description: "Informasi profil Anda telah berhasil disimpan.",
+        title: t("profile.update.success.title"),
+        description: t("profile.update.success.description"),
       });
     } catch (error: unknown) {
       toast({
         variant: "destructive",
-        title: "Gagal Memperbarui Profil",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: t("profile.update.error.title"),
+        description: error instanceof Error ? error.message : t("error.unknown"),
       });
     } finally {
       setIsUpdating(false);
@@ -121,8 +123,8 @@ export default function ProfilePage() {
     if (!user || !user.email) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Email pengguna tidak ditemukan.",
+        title: t("error.generic"),
+        description: t("profile.error.emailNotFound"),
       });
       return;
     }
@@ -131,13 +133,13 @@ export default function ProfilePage() {
     const result = await authService.sendPasswordReset(user.email);
     if (result.success) {
       toast({
-        title: "Email Terkirim",
-        description: "Email pengaturan ulang kata sandi telah dikirim ke " + user.email,
+        title: t("profile.passwordReset.success.title"),
+        description: t("profile.passwordReset.success.description", { email: user.email }),
       });
     } else {
       toast({
         variant: "destructive",
-        title: "Gagal mengirim email",
+        title: t("profile.passwordReset.error.title"),
         description: result.error,
       });
     }
@@ -164,48 +166,48 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4">
             <UserIcon className="h-6 w-6 text-primary" />
             <div>
-              <CardTitle>Profil Pengguna</CardTitle>
-              <CardDescription>Lihat dan kelola informasi profil Anda.</CardDescription>
+              <CardTitle>{t("profile.title")}</CardTitle>
+              <CardDescription>{t("profile.description")}</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-6 rounded-lg border p-4">
-              <h3 className="mb-6 text-lg font-medium">Informasi Profil</h3>
+              <h3 className="mb-6 text-lg font-medium">{t("profile.sections.profileInfo")}</h3>
               <div className="flex items-center justify-center">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarUrl} alt={user.displayName ?? "Pengguna"} />
+                  <AvatarImage src={avatarUrl} alt={user.displayName ?? t("user")} />
                   <AvatarFallback className="text-3xl">{getInitials(user.email)}</AvatarFallback>
                 </Avatar>
               </div>
 
               <FloatingLabelInput
                 id="displayName"
-                label="Nama Tampilan"
-                placeholder="contoh: John Doe"
+                label={t("profile.fields.displayName")}
+                placeholder="John Doe"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
               />
               <FloatingLabelInput
                 id="photoURL"
-                label="URL Avatar"
-                placeholder="contoh: https://example.com/avatar.png"
+                label={t("profile.fields.avatarUrl")}
+                placeholder="https://example.com/avatar.png"
                 value={photoURL}
                 onChange={(e) => setPhotoURL(e.target.value)}
               />
               <FloatingLabelInput
                 id="email"
                 type="email"
-                label="Email"
-                placeholder="contoh: john.doe@example.com"
+                label={t("profile.fields.email")}
+                placeholder="john.doe@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <FloatingLabelInput
                 id="phoneNumber"
-                label="Nomor Telepon"
-                placeholder="contoh: +6281234567890"
+                label={t("profile.fields.phoneNumber")}
+                placeholder="+1234567890"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
@@ -213,9 +215,9 @@ export default function ProfilePage() {
 
             {hasPasswordProvider && (
               <div className="space-y-4 rounded-lg border p-4">
-                <h3 className="mb-4 text-lg font-medium">Keamanan</h3>
+                <h3 className="mb-4 text-lg font-medium">{t("profile.sections.security")}</h3>
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Kata Sandi</Label>
+                  <Label className="text-sm font-medium text-muted-foreground">{t("profile.fields.password")}</Label>
                   <div className="mt-2">
                     <Button
                       type="button"
@@ -224,7 +226,7 @@ export default function ProfilePage() {
                       disabled={isPasswordResetLoading}
                     >
                       {isPasswordResetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Kirim Email Atur Ulang Kata Sandi
+                      {t("profile.buttons.sendPasswordReset")}
                     </Button>
                   </div>
                 </div>
@@ -232,11 +234,11 @@ export default function ProfilePage() {
             )}
 
             <div className="space-y-6 rounded-lg border p-4">
-              <h3 className="mb-4 text-lg font-medium">Detail Akun (Hanya Baca)</h3>
-              <FloatingLabelInput id="uid" label="ID Pengguna (UID)" defaultValue={user.uid} disabled />
+              <h3 className="mb-4 text-lg font-medium">{t("profile.sections.accountDetails")}</h3>
+              <FloatingLabelInput id="uid" label={t("profile.fields.userId")} defaultValue={user.uid} disabled />
               <FloatingLabelInput
                 id="creationTime"
-                label="Waktu Pembuatan"
+                label={t("profile.fields.creationTime")}
                 defaultValue={
                   user.metadata.creationTime ? format(new Date(user.metadata.creationTime), "PPP p") : "N/A"
                 }
@@ -244,18 +246,28 @@ export default function ProfilePage() {
               />
               <FloatingLabelInput
                 id="lastSignInTime"
-                label="Terakhir Masuk"
+                label={t("profile.fields.lastSignIn")}
                 defaultValue={
                   user.metadata.lastSignInTime ? format(new Date(user.metadata.lastSignInTime), "PPP p") : "N/A"
                 }
                 disabled
               />
-              <SwitchControl id="emailVerified" label="Email Terverifikasi" checked={user.emailVerified} disabled />
-              <SwitchControl id="isAnonymous" label="Akun Anonim" checked={user.isAnonymous} disabled />
+              <SwitchControl
+                id="emailVerified"
+                label={t("profile.fields.emailVerified")}
+                checked={user.emailVerified}
+                disabled
+              />
+              <SwitchControl
+                id="isAnonymous"
+                label={t("profile.fields.anonymousAccount")}
+                checked={user.isAnonymous}
+                disabled
+              />
             </div>
 
             <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="mb-4 text-lg font-medium">Penyedia</h3>
+              <h3 className="mb-4 text-lg font-medium">{t("profile.sections.providers")}</h3>
               <div className="space-y-2">
                 {user.providerData.map((provider) => (
                   <div key={provider.providerId} className="flex items-center gap-3 rounded-md bg-muted p-3">
@@ -275,7 +287,7 @@ export default function ProfilePage() {
             <div className="flex justify-end">
               <Button type="submit" disabled={isUpdating}>
                 {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Simpan Perubahan
+                {t("profile.buttons.saveChanges")}
               </Button>
             </div>
           </form>

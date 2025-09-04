@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -16,20 +16,23 @@ import { useLanguage } from "@/hooks/use-language";
 import { AuthLayout } from "@/features/auth/components/auth-layout";
 import { authService } from "@/features/auth/services/auth.service";
 
-const signupFormSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-});
+const getSignupFormSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().email({
+      message: t("validation.email.required"),
+    }),
+    password: z.string().min(6, {
+      message: t("validation.password.required"),
+    }),
+  });
 
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+
+  const signupFormSchema = useMemo(() => getSignupFormSchema(t), [t]);
 
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -40,7 +43,7 @@ export default function SignupPage() {
   });
 
   const handleError = (error: string) => {
-    let description = "An unexpected error occurred.";
+    let description = t("error.unknown");
     switch (error) {
       case "auth/email-already-in-use":
         description = t("signup.error.emailAlreadyInUse");

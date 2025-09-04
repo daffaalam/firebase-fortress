@@ -1,4 +1,5 @@
 import { initializeApp, getApps, App, cert } from "firebase-admin/app";
+import en from "@/locales/en.json";
 
 const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
   ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
@@ -12,7 +13,7 @@ export async function initializeAdminApp() {
   }
 
   if (!serviceAccount) {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.");
+    throw new Error(en["error.serviceAccountKeyMissing"]);
   }
 
   try {

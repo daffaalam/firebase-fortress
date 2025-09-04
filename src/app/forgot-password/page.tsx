@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -16,16 +16,19 @@ import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { AuthLayout } from "@/features/auth/components/auth-layout";
 
-const forgotPasswordSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-});
+const getForgotPasswordSchema = (t: (key: any) => string) =>
+  z.object({
+    email: z.string().email({
+      message: t("validation.email.required"),
+    }),
+  });
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+
+  const forgotPasswordSchema = useMemo(() => getForgotPasswordSchema(t), [t]);
 
   const form = useForm<z.infer<typeof forgotPasswordSchema>>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -38,7 +41,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Koneksi ke layanan otentikasi gagal.");
+      if (!auth) throw new Error(t("error.authServiceConnectionFailed"));
       const actionCodeSettings = {
         url: window.location.origin + "/auth/action",
         handleCodeInApp: true,
@@ -50,7 +53,7 @@ export default function ForgotPasswordPage() {
       });
       // Don't redirect, just show success message
     } catch (error: unknown) {
-      let description = "An unexpected error occurred.";
+      let description = t("error.unknown");
       if (error instanceof Error) {
         description = error.message;
       }

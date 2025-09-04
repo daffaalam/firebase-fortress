@@ -13,12 +13,13 @@ import {
   UserProfile,
 } from "firebase/auth";
 import { getFirebaseClient } from "@/lib/firebase";
+import en from "@/locales/en.json";
 
 export const authService = {
   async signInWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Authentication service not available.");
+      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
       if (!userCredential.user.emailVerified) {
@@ -27,15 +28,16 @@ export const authService = {
       }
 
       return { success: true, user: userCredential.user };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async sendPasswordlessLink(email: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Authentication service not available.");
+      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
       const actionCodeSettings = {
         url: `${window.location.origin}/auth/action?mode=signIn`,
         handleCodeInApp: true,
@@ -43,37 +45,40 @@ export const authService = {
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", email);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async signInWithGoogle() {
     try {
       const { auth, googleProvider } = await getFirebaseClient();
-      if (!auth || !googleProvider) throw new Error("Google Sign-In not available.");
+      if (!auth || !googleProvider) throw new Error(en["error.googleSignInNotAvailable"]);
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async signOutUser() {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Authentication service not available.");
+      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
       await signOut(auth);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async signUpWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Authentication service not available.");
+      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const actionCodeSettings = {
         url: `${window.location.origin}/login`,
@@ -81,8 +86,9 @@ export const authService = {
       };
       await sendEmailVerification(userCredential.user, actionCodeSettings);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
@@ -90,36 +96,39 @@ export const authService = {
     try {
       await updateProfile(user, profileData);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async verifyEmail(user: User, newEmail: string) {
     try {
       const actionCodeSettings = {
-        url: `${window.location.origin}/profile`,
+        url: `${window.location.origin}/dashboard/profile`,
         handleCodeInApp: true,
       };
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 
   async sendPasswordReset(email: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error("Authentication service not available.");
+      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
       const actionCodeSettings = {
         url: `${window.location.origin}/login`,
         handleCodeInApp: true,
       };
       await sendPasswordResetEmail(auth, email, actionCodeSettings);
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.code || "auth/unknown-error" };
+    } catch (error: unknown) {
+      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      return { success: false, error: errorCode };
     }
   },
 

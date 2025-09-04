@@ -6,10 +6,12 @@ import { Users, PlusCircle } from "lucide-react";
 import { AddUserDialog } from "@/features/dashboard/components/users/add-user-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function UsersPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [refreshUsers, setRefreshUsers] = useState(false);
+  const { t } = useLanguage();
 
   const onUserAdded = () => {
     setRefreshUsers((prev) => !prev); // Toggle to trigger re-fetch
@@ -24,13 +26,13 @@ export default function UsersPage() {
             <div className="flex items-center gap-3">
               <Users className="h-6 w-6 text-primary" />
               <div>
-                <CardTitle>Manajemen Pengguna</CardTitle>
-                <CardDescription>Lihat, perbarui, dan kelola semua pengguna di aplikasi Anda.</CardDescription>
+                <CardTitle>{t("userManagement.title")}</CardTitle>
+                <CardDescription>{t("userManagement.description")}</CardDescription>
               </div>
             </div>
             <Button onClick={() => setIsDialogOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Tambah Pengguna
+              {t("userManagement.addUserButton")}
             </Button>
           </div>
         </CardHeader>

@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { createUser } from "@/features/auth/services/user.service";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
 
 interface AddUserDialogProps {
   open: boolean;
@@ -24,6 +25,7 @@ interface AddUserDialogProps {
 
 export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialogProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,14 +34,14 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
     if (!email) {
-      newErrors.email = "Email diperlukan.";
+      newErrors.email = t("userManagement.addUser.validation.emailRequired");
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Alamat email tidak valid.";
+      newErrors.email = t("userManagement.addUser.validation.emailInvalid");
     }
     if (!password) {
-      newErrors.password = "Kata sandi diperlukan.";
+      newErrors.password = t("userManagement.addUser.validation.passwordRequired");
     } else if (password.length < 6) {
-      newErrors.password = "Kata sandi harus minimal 6 karakter.";
+      newErrors.password = t("userManagement.addUser.validation.passwordLength");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -61,8 +63,8 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
 
     if (result.success) {
       toast({
-        title: "Pengguna Dibuat",
-        description: `Pengguna baru dengan email ${email} telah berhasil dibuat.`,
+        title: t("userManagement.addUser.success.title"),
+        description: t("userManagement.addUser.success.description", { email: email }),
       });
       onUserAdded();
       onOpenChange(false);
@@ -72,8 +74,8 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
     } else {
       toast({
         variant: "destructive",
-        title: "Gagal Membuat Pengguna",
-        description: result.error || "Terjadi kesalahan yang tidak diketahui.",
+        title: t("userManagement.addUser.error.title"),
+        description: result.error || t("error.unknown"),
       });
     }
   };
@@ -83,13 +85,13 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Tambah Pengguna Baru</DialogTitle>
-            <DialogDescription>Masukkan detail di bawah ini untuk membuat akun pengguna baru.</DialogDescription>
+            <DialogTitle>{t("userManagement.addUser.title")}</DialogTitle>
+            <DialogDescription>{t("userManagement.addUser.description")}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
-                Email
+                {t("login.emailLabel")}
               </Label>
               <div className="col-span-3">
                 <Input
@@ -105,7 +107,7 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="password" className="text-right">
-                Kata Sandi
+                {t("login.passwordLabel")}
               </Label>
               <div className="col-span-3">
                 <Input
@@ -122,11 +124,11 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-              Batal
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Buat Pengguna
+              {t("userManagement.addUser.createButton")}
             </Button>
           </DialogFooter>
         </form>

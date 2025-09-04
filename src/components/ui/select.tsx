@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/use-language";
 
 const Select = SelectPrimitive.Root;
 
@@ -149,9 +150,6 @@ const LanguageSwitcher = () => {
     </div>
   );
 };
-
-// Re-export useLanguage to be used in LanguageSwitcher
-import { useLanguage } from "@/hooks/use-language";
 
 export {
   Select,

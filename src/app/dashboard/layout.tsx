@@ -30,48 +30,50 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { getGravatarUrl, getInitials } from "@/lib/utils";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSignOut = async () => {
     const result = await authService.signOutUser();
     if (result.success) {
       window.localStorage.removeItem("emailForSignIn");
       toast({
-        title: "Signed Out",
-        description: "You have been successfully signed out.",
+        title: t("signOut.success.title"),
+        description: t("signOut.success.description"),
       });
       router.push("/login");
     } else {
       toast({
         variant: "destructive",
-        title: "Sign Out Error",
+        title: t("signOut.error.title"),
         description: result.error,
       });
     }
   };
 
   const getPageTitle = () => {
-    if (pathname === "/dashboard") return "Dashboard";
-    if (pathname.startsWith("/dashboard/users")) return "User Management";
-    if (pathname.startsWith("/dashboard/profile")) return "Profile";
-    return "Dashboard";
+    if (pathname === "/dashboard") return t("dashboard.title");
+    if (pathname.startsWith("/dashboard/users")) return t("userManagement.title");
+    if (pathname.startsWith("/dashboard/profile")) return t("profile.title");
+    return t("dashboard.title");
   };
 
   const menuItems = [
     {
       href: "/dashboard",
-      label: "Dashboard",
+      label: t("dashboard.title"),
       icon: LayoutDashboard,
       isActive: pathname === "/dashboard",
     },
     {
       href: "/dashboard/users",
-      label: "Users",
+      label: t("userManagement.menuLabel"),
       icon: Users,
       isActive: pathname.startsWith("/dashboard/users"),
     },
@@ -85,7 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <SidebarHeader>
           <Link href="/dashboard" className="flex items-center gap-2">
             <Logo className="size-8 text-primary" />
-            <span className="text-lg font-semibold">Firebase Fortress</span>
+            <span className="text-lg font-semibold">{t("appName")}</span>
           </Link>
         </SidebarHeader>
         <SidebarContent>
@@ -121,12 +123,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("myAccount")}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/profile">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t("profile.title")}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -135,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>{t("signOut.button")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
