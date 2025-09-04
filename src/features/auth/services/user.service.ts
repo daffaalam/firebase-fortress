@@ -4,7 +4,6 @@ import { auth as adminAuth } from "firebase-admin";
 import { initializeAdminApp } from "@/lib/firebase-admin";
 import type { UserRecord } from "../models/user.model";
 import { z } from "zod";
-import en from "@/locales/en.json";
 
 const CreateUserSchema = z.object({
   email: z.string().email(),
@@ -22,7 +21,10 @@ export async function createUser(formData: FormData) {
     return { success: true };
   } catch (error: unknown) {
     console.error("Error creating user:", error);
-    const errorMessage = error instanceof Error ? error.message : en["userManagement.addUser.error.generic"];
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors.map((e) => e.message).join(", ") };
+    }
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
     return { success: false, error: errorMessage };
   }
 }

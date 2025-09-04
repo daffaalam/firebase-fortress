@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -32,7 +32,7 @@ export default function SignupPage() {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
-  const signupFormSchema = useMemo(() => getSignupFormSchema(t), [t]);
+  const signupFormSchema = getSignupFormSchema(t);
 
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -48,8 +48,11 @@ export default function SignupPage() {
       case "auth/email-already-in-use":
         description = t("signup.error.emailAlreadyInUse");
         break;
+      case "error.authServiceConnectionFailed":
+        description = t("error.authServiceConnectionFailed");
+        break;
       default:
-        description = error;
+        description = t("error.unknown");
     }
     toast({
       variant: "destructive",

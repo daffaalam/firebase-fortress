@@ -15,13 +15,12 @@ import {
   UserProfile,
 } from "firebase/auth";
 import { getFirebaseClient } from "@/lib/firebase";
-import en from "@/locales/en.json";
 
 export const authService = {
   async signInWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
+      if (!auth) return { success: false, error: "error.authServiceConnectionFailed" };
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
       if (!userCredential.user.emailVerified) {
@@ -40,7 +39,7 @@ export const authService = {
   async sendPasswordlessLink(email: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
+      if (!auth) return { success: false, error: "error.authServiceConnectionFailed" };
       const actionCodeSettings = {
         url: `${window.location.origin}/auth/action?mode=signIn`,
         handleCodeInApp: true,
@@ -58,7 +57,7 @@ export const authService = {
   async signInWithGoogle() {
     try {
       const { auth, googleProvider } = await getFirebaseClient();
-      if (!auth || !googleProvider) throw new Error(en["error.googleSignInNotAvailable"]);
+      if (!auth || !googleProvider) return { success: false, error: "error.googleSignInNotAvailable" };
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
     } catch (error: unknown) {
@@ -71,7 +70,7 @@ export const authService = {
   async signOutUser() {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
+      if (!auth) return { success: false, error: "error.authServiceConnectionFailed" };
       await signOut(auth);
       return { success: true };
     } catch (error: unknown) {
@@ -84,7 +83,7 @@ export const authService = {
   async signUpWithEmail(email: string, password: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
+      if (!auth) return { success: false, error: "error.authServiceConnectionFailed" };
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const actionCodeSettings = {
         url: `${window.location.origin}/login`,
@@ -128,7 +127,7 @@ export const authService = {
   async sendPasswordReset(email: string) {
     try {
       const { auth } = await getFirebaseClient();
-      if (!auth) throw new Error(en["error.authServiceConnectionFailed"]);
+      if (!auth) return { success: false, error: "error.authServiceConnectionFailed" };
       const actionCodeSettings = {
         url: `${window.location.origin}/login`,
         handleCodeInApp: true,

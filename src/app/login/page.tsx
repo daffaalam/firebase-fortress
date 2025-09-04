@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -38,8 +38,8 @@ export default function LoginPage() {
   const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false);
   const [signInMethod, setSignInMethod] = useState<"emailLink" | "password">("emailLink");
 
-  const passwordFormSchema = useMemo(() => getPasswordFormSchema(t), [t]);
-  const passwordlessFormSchema = useMemo(() => getPasswordlessFormSchema(t), [t]);
+  const passwordFormSchema = getPasswordFormSchema(t);
+  const passwordlessFormSchema = getPasswordlessFormSchema(t);
 
   const form = useForm<z.infer<typeof passwordFormSchema>>({
     resolver: zodResolver(passwordFormSchema),
@@ -74,8 +74,14 @@ export default function LoginPage() {
       case "auth/account-exists-with-different-credential":
         description = t("login.error.accountExistsWithDifferentCredential");
         break;
+      case "error.authServiceConnectionFailed":
+        description = t("error.authServiceConnectionFailed");
+        break;
+      case "error.googleSignInNotAvailable":
+        description = t("error.googleSignInNotAvailable");
+        break;
       default:
-        description = error;
+        description = t("error.unknown");
     }
     toast({
       variant: "destructive",

@@ -100,7 +100,7 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full"
-                  placeholder="name@example.com"
+                  placeholder={t("login.emailPlaceholder")}
                 />
                 {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
               </div>
@@ -116,7 +116,7 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialog
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full"
-                  placeholder="••••••••"
+                  placeholder={t("login.passwordPlaceholder")}
                 />
                 {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
               </div>
