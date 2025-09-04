@@ -1,3 +1,5 @@
+"use client";
+
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -29,7 +31,8 @@ export const authService = {
 
       return { success: true, user: userCredential.user };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -46,7 +49,8 @@ export const authService = {
       window.localStorage.setItem("emailForSignIn", email);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -58,7 +62,8 @@ export const authService = {
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -70,7 +75,8 @@ export const authService = {
       await signOut(auth);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -87,7 +93,8 @@ export const authService = {
       await sendEmailVerification(userCredential.user, actionCodeSettings);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -97,7 +104,8 @@ export const authService = {
       await updateProfile(user, profileData);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -111,7 +119,8 @@ export const authService = {
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },
@@ -127,7 +136,8 @@ export const authService = {
       await sendPasswordResetEmail(auth, email, actionCodeSettings);
       return { success: true };
     } catch (error: unknown) {
-      const errorCode = error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
+      const errorCode =
+        error instanceof Error && "code" in error ? (error as { code: string }).code : "auth/unknown-error";
       return { success: false, error: errorCode };
     }
   },

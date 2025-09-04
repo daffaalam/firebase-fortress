@@ -4,7 +4,6 @@ import { auth as adminAuth } from "firebase-admin";
 import { initializeAdminApp } from "@/lib/firebase-admin";
 import type { UserRecord } from "../models/user.model";
 import { z } from "zod";
-import { Locales } from "@/locales/locales";
 import en from "@/locales/en.json";
 
 const CreateUserSchema = z.object({
