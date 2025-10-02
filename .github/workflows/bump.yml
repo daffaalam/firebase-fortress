@@ -4,18 +4,14 @@ on:
   push:
     branches:
       - dev
-  pull_request:
-    types:
-      - closed
+      - main
 
 jobs:
   bump:
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -37,19 +33,21 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump patch on dev
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/dev'
         run: |
+          echo "Bump patch version"
           npm version patch -m "chore(release): bump patch version to %s [skip ci]"
           git push origin HEAD:dev --tags
 
-      - name: Bump minor on main PR merge
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+      - name: Bump minor on main
+        if: github.ref == 'refs/heads/main'
         run: |
+          echo "Bump minor version"
           npm version minor -m "chore(release): bump minor version to %s [skip ci]"
           git push origin HEAD:main --tags
 
       - name: Sync main to dev (auto-resolve conflicts)
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+        if: github.ref == 'refs/heads/main'
         run: |
           git fetch origin
           git checkout dev || git checkout -b dev
