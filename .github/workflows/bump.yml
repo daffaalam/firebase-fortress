@@ -5,14 +5,14 @@ on:
     branches:
       - dev
   pull_request:
-    branches:
-      - main
     types:
       - closed
 
 jobs:
   bump:
-    if: github.ref == 'refs/heads/dev' || (github.event.pull_request.merged == true && github.base_ref == 'main')
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -37,22 +37,20 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump patch on dev
-        if: github.ref == 'refs/heads/dev'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
         run: |
           npm version patch -m "chore(release): bump patch version to %s [skip ci]"
           git push origin HEAD:dev --tags
 
       - name: Bump minor on main PR merge
-        if: github.event.pull_request.merged == true && github.base_ref == 'main'
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
         run: |
           npm version minor -m "chore(release): bump minor version to %s [skip ci]"
           git push origin HEAD:main --tags
 
       - name: Sync main to dev (auto-resolve conflicts)
-        if: github.event.pull_request.merged == true && github.base_ref == 'main' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin
           git checkout dev || git checkout -b dev
           git merge origin/main --ff -X theirs
